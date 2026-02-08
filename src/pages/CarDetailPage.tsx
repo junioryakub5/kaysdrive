@@ -222,7 +222,7 @@ export const CarDetailPage = () => {
                                 <motion.a
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    href={agent ? `https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                                    href={agent ? `https://wa.me/${agent.phone.replace(/[^0-9+]/g, '').replace(/^0/, '233')}?text=${encodeURIComponent(
                                         `Hi, I'm interested in:
 
 ${car.title}
@@ -243,7 +243,7 @@ I'd like to ${car.status === 'sale' ? 'make an offer' : 'book this vehicle'}.`
                                 </motion.a>
 
                                 <a
-                                    href={agent ? `https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                                    href={agent ? `https://wa.me/${agent.phone.replace(/[^0-9+]/g, '').replace(/^0/, '233')}?text=${encodeURIComponent(
                                         `Hi, I'd like to schedule a test drive for:
 
 ${car.title}
