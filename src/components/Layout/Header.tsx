@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiShoppingCart, FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoginDropdown } from './LoginDropdown';
 
@@ -34,7 +34,7 @@ export const Header = () => {
         setMobileMenuOpen(false);
     }, [location.pathname]);
 
-    const showTransparentNav = isHomePage && !scrolled;
+    const showTransparentNav = isHomePage && !scrolled && !mobileMenuOpen;
 
     return (
         <motion.header
@@ -47,28 +47,19 @@ export const Header = () => {
             <div className="max-w-7xl mx-auto px-6 py-4">
                 <div className="flex items-center justify-between">
                     {/* Logo */}
-                    <div className="flex items-center gap-4">
-                        <button className="lg:hidden">
-                            <div className="grid grid-cols-3 gap-1">
-                                {[...Array(9)].map((_, i) => (
-                                    <div key={i} className="w-1 h-1 bg-gray-800 rounded-full" />
-                                ))}
-                            </div>
-                        </button>
-                        <Link to="/" className="flex items-center gap-2">
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                className="cursor-pointer flex items-center gap-2"
-                            >
-                                {/* TODO: Replace with actual logo image when correct file is provided */}
-                                {/* <img src="/images/kays-drive-logo.png" alt="Kays Drive" className="h-10" /> */}
-                                <h1 className={`text-2xl font-bold ${showTransparentNav ? 'text-white' : 'text-gray-900'}`}>
-                                    <span className={showTransparentNav ? 'text-white/80' : 'text-gray-500'}>KAY'S</span>{' '}
-                                    <span className={showTransparentNav ? 'text-white' : 'text-primary'}>DRIVE</span>
-                                </h1>
-                            </motion.div>
-                        </Link>
-                    </div>
+                    <Link to="/" className="flex items-center">
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="cursor-pointer flex items-center"
+                        >
+                            {/* TODO: Replace with actual logo image when correct file is provided */}
+                            {/* <img src="/images/kays-drive-logo.png" alt="Kays Drive" className="h-10" /> */}
+                            <h1 className={`text-2xl font-bold ${showTransparentNav ? 'text-white' : 'text-gray-900'}`}>
+                                <span className={showTransparentNav ? 'text-white/80' : 'text-gray-500'}>KAY'S</span>{' '}
+                                <span className={showTransparentNav ? 'text-white' : 'text-primary'}>DRIVE</span>
+                            </h1>
+                        </motion.div>
+                    </Link>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center gap-8">
@@ -115,18 +106,18 @@ export const Header = () => {
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            className="relative"
-                        >
-                            <FiShoppingCart
-                                className={`w-5 h-5 ${showTransparentNav ? 'text-white' : 'text-gray-900'}`}
-                            />
-                            <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                                0
-                            </span>
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                                if (location.pathname === '/') {
+                                    // Scroll to filter section on homepage
+                                    const filterSection = document.querySelector('.search-filters');
+                                    if (filterSection) {
+                                        filterSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
+                                } else {
+                                    // Navigate to cars page with search
+                                    window.location.href = '/cars';
+                                }
+                            }}
                         >
                             <FiSearch
                                 className={`w-5 h-5 ${showTransparentNav ? 'text-white' : 'text-gray-900'}`}
@@ -169,7 +160,7 @@ export const Header = () => {
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="lg:hidden mt-4 pb-4 flex flex-col gap-4 overflow-hidden"
+                            className="lg:hidden mt-4 pb-4 flex flex-col gap-4 overflow-hidden bg-white rounded-lg px-4"
                         >
                             {navItems.map((item, index) => (
                                 <motion.div
@@ -180,7 +171,9 @@ export const Header = () => {
                                 >
                                     <Link
                                         to={item.href}
-                                        className={`font-medium ${location.pathname === item.href ? 'text-primary' : 'text-gray-700'
+                                        className={`font-medium ${location.pathname === item.href
+                                            ? 'text-primary'
+                                            : 'text-gray-900'
                                             }`}
                                     >
                                         {item.label}

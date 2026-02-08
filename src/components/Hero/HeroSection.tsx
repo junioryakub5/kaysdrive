@@ -49,12 +49,22 @@ export const HeroSection = () => {
                     transition={{ duration: 0.6, delay: 0.8 }}
                     className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
                 >
-                    <motion.div
+                    <motion.button
                         animate={{ y: [0, 10, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                            const filterSection = document.querySelector('.search-filters');
+                            if (filterSection) {
+                                filterSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }}
+                        className="cursor-pointer focus:outline-none"
+                        aria-label="Scroll to search filters"
                     >
                         <FiChevronDown className="w-8 h-8 text-white" />
-                    </motion.div>
+                    </motion.button>
                 </motion.div>
             </div>
         </section>

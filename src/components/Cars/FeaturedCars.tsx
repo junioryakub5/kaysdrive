@@ -59,7 +59,7 @@ export const FeaturedCars = () => {
                         Featured cars
                     </h2>
                     <p className="text-text-secondary text-lg">
-                        Curabitur tellus leo, euismod sit amet gravida at, egestas sed.
+                        Discover our hand-picked selection of premium luxury vehicles, carefully chosen for their exceptional quality and condition.
                     </p>
                 </motion.div>
 
