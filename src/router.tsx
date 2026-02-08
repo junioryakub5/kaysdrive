@@ -6,16 +6,16 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import AdminLayout from './components/Admin/AdminLayout';
 import AgentLayout from './components/Agent/AgentLayout';
 
-// Lazy load heavy pages
-const CarsListingPage = lazy(() => import('./pages/CarsListingPage'));
-const CarDetailPage = lazy(() => import('./pages/CarDetailPage'));
-const AboutPage = lazy(() => import('./pages/AboutPage'));
-const ServicesPage = lazy(() => import('./pages/ServicesPage'));
-const AgentsPage = lazy(() => import('./pages/AgentsPage'));
-const ContactPage = lazy(() => import('./pages/ContactPage'));
-const FAQPage = lazy(() => import('./pages/FAQPage'));
-const AdminLogin = lazy(() => import('./pages/AdminLogin'));
-const AgentLogin = lazy(() => import('./pages/AgentLogin'));
+// Lazy load heavy pages - use named imports wrapped for named exports
+const CarsListingPage = lazy(() => import('./pages/CarsListingPage').then(m => ({ default: m.CarsListingPage })));
+const CarDetailPage = lazy(() => import('./pages/CarDetailPage').then(m => ({ default: m.CarDetailPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const ServicesPage = lazy(() => import('./pages/ServicesPage').then(m => ({ default: m.ServicesPage })));
+const AgentsPage = lazy(() => import('./pages/AgentsPage').then(m => ({ default: m.AgentsPage })));
+const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ default: m.ContactPage })));
+const FAQPage = lazy(() => import('./pages/FAQPage').then(m => ({ default: m.FAQPage })));
+const AdminLogin = lazy(() => import('./pages/AdminLogin').then(m => ({ default: m.AdminLogin })));
+const AgentLogin = lazy(() => import('./pages/AgentLogin').then(m => ({ default: m.AgentLogin })));
 
 // Admin Pages (Lazy loaded)
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
