@@ -263,7 +263,15 @@ export default function Cars() {
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Category</label>
-                                        <input className="form-input" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required />
+                                        <select className="form-select" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} required>
+                                            <option value="">Select Type</option>
+                                            <option value="Sedan">Sedan</option>
+                                            <option value="Hatchback">Hatchback</option>
+                                            <option value="SUV">SUV</option>
+                                            <option value="Pick Up">Pick Up</option>
+                                            <option value="Coupe">Coupe</option>
+                                            <option value="Convertible">Convertible</option>
+                                        </select>
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Manufacturer</label>
