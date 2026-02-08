@@ -12,8 +12,9 @@ import { uploadRouter } from './routes/upload.js';
 const app = express();
 
 // Middleware - Allow frontend, admin, and agent portal origins
+const allowedOrigins = config.corsOrigin ? config.corsOrigin.split(',') : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+    origin: allowedOrigins,
     credentials: true,
 }));
 app.use(express.json());
