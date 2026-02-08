@@ -358,7 +358,9 @@
     gap: 0.75rem;
     padding: 1rem 1.5rem;
     border-top: 1px solid var(--border);
-    background: var(--bg-hover);
+    background: var(--bg-page);
+    flex-shrink: 0;
+    /* Order buttons properly: Cancel (left), Primary action (right) */
 }
 
 /* ============ Loading State ============ */
@@ -796,14 +798,20 @@
 
     .modal-footer {
         padding: 1rem 1.25rem;
-        flex-direction: column-reverse;
-        gap: 0.5rem;
+        flex-direction: row;
+        /* Horizontal layout for professional look */
+        justify-content: space-between;
+        /* Space buttons evenly */
+        gap: 0.75rem;
         flex-shrink: 0;
         /* Prevent footer from shrinking */
     }
 
     .modal-footer .btn {
-        width: 100%;
+        flex: 1;
+        /* Buttons take equal width */
+        min-width: 0;
+        /* Allow buttons to shrink if needed */
     }
 }
 
