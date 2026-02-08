@@ -79,8 +79,8 @@ export const SearchBar = () => {
                                 className="px-4 py-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                             >
                                 <option value="">All</option>
-                                <option value="SALE">Sale</option>
-                                <option value="RENT">Rent</option>
+                                <option value="FOREIGN_USED">Foreign Used</option>
+                                <option value="GHANA_USED">Ghana Used</option>
                             </motion.select>
                         </motion.div>
 
