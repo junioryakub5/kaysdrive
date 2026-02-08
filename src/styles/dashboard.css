@@ -358,7 +358,7 @@
     gap: 0.75rem;
     padding: 1rem 1.5rem;
     border-top: 1px solid var(--border);
-    background: var(--bg-page);
+    background: var(--success-bg);
     flex-shrink: 0;
     /* Order buttons properly: Cancel (left), Primary action (right) */
 }

@@ -32,7 +32,7 @@ model Car {
   isPublished  Boolean  @default(true)
   isFeatured   Boolean  @default(false)
   agentId      String
-  agent        Agent    @relation(fields: [agentId], references: [id])
+  agent        Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
