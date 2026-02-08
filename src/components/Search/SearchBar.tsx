@@ -32,7 +32,7 @@ export const SearchBar = () => {
         // Build query params from filters
         const params = new URLSearchParams();
         if (filters.status) params.append('status', filters.status);
-        if (filters.category) params.append('category', filters.category);
+        if (filters.category) params.append('type', filters.category);
         if (filters.manufacturer) params.append('manufacturer', filters.manufacturer);
         if (filters.city) params.append('city', filters.city);
 
