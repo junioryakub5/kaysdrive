@@ -33,8 +33,10 @@ dist-ssr/
 *.db
 *.db-journal
 
-# Uploads and public assets
-uploads/
+# Uploads and public # Don't ignore the uploads directory itself (we need .gitkeep)
+# But ignore all uploaded files
+backend/uploads/*
+!backend/uploads/.gitkeep
 public/uploads/
 
 # Logs
