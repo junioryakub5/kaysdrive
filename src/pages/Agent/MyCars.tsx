@@ -159,7 +159,7 @@ export default function MyCars() {
                                         </td>
                                         <td>
                                             <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>
-                                                {car.status}
+                                                {car.status === 'FOREIGN_USED' ? 'FU' : 'GU'}
                                             </span>
                                         </td>
                                         <td>
@@ -197,7 +197,7 @@ export default function MyCars() {
                                     </div>
                                     <div className="car-card-footer">
                                         <div className="car-card-toggles">
-                                            <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>{car.status}</span>
+                                            <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>{car.status === 'FOREIGN_USED' ? 'FU' : 'GU'}</span>
                                             <span className={`badge ${car.isPublished ? 'badge-success' : 'badge-warning'}`}>
                                                 {car.isPublished ? 'Published' : 'Pending'}
                                             </span>

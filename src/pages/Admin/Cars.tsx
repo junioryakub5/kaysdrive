@@ -161,7 +161,7 @@ export default function Cars() {
                                 </td>
                                 <td>
                                     <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>
-                                        {car.status}
+                                        {car.status === 'FOREIGN_USED' ? 'FU' : 'GU'}
                                     </span>
                                 </td>
                                 <td>
@@ -214,7 +214,7 @@ export default function Cars() {
                                     </label>
                                 </div>
                                 <div className="car-card-actions">
-                                    <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>{car.status}</span>
+                                    <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>{car.status === 'FOREIGN_USED' ? 'FU' : 'GU'}</span>
                                     <button className="action-btn" onClick={() => openModal(car)}>✏️</button>
                                     <button className="action-btn danger" onClick={() => handleDelete(car)}>🗑️</button>
                                 </div>
