@@ -347,7 +347,7 @@ export const CarsListingPage = () => {
                                             mileage={`${(car.mileage / 1000).toFixed(0)}k mi`}
                                             engine={car.engine}
                                             fuel={car.fuel.charAt(0).toUpperCase() + car.fuel.slice(1)}
-                                            transmission={car.transmission === 'automatic' ? 'Tiptronic' : 'Manual'}
+                                            transmission={car.transmission.charAt(0).toUpperCase() + car.transmission.slice(1)}
                                             city={car.city}
                                             slug={car.slug}
                                             agent={car.agent?.name || 'Agent'}
