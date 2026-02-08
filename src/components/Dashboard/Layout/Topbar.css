@@ -1,0 +1,132 @@
+/* ===========================================
+   TOPBAR STYLES
+   =========================================== */
+
+.topbar {
+    height: var(--topbar-height);
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    z-index: 50;
+    transition: left var(--transition-base);
+}
+
+.topbar.collapsed-sidebar {
+    left: var(--sidebar-collapsed);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.breadcrumb-item {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.breadcrumb-item:hover {
+    color: var(--primary);
+}
+
+.breadcrumb-separator {
+    color: var(--text-muted);
+}
+
+.breadcrumb-current {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Actions */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.topbar-link {
+    font-size: 0.875rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity var(--transition-fast);
+}
+
+.topbar-link:hover {
+    opacity: 0.8;
+}
+
+/* ===========================================
+   TOPBAR MOBILE RESPONSIVE STYLES
+   =========================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .topbar {
+        left: var(--sidebar-collapsed);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .topbar {
+        left: 0;
+        padding: 0 0.75rem;
+        padding-left: 3.5rem;
+        /* Space for hamburger menu */
+    }
+
+    .breadcrumb {
+        font-size: 0.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 50%;
+        flex-shrink: 1;
+    }
+
+    .topbar-link {
+        font-size: 0.75rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+    .topbar {
+        padding-left: 3rem;
+        padding-right: 0.5rem;
+    }
+
+    .breadcrumb-item:first-child {
+        /* Hide "Home" on very small screens, keep just the icon */
+        font-size: 0;
+    }
+
+    .breadcrumb-item:first-child::before {
+        content: '🏠';
+        font-size: 0.75rem;
+    }
+
+    /* Hide middle breadcrumb items on very small screens */
+    .breadcrumb-item:not(:first-child):not(:last-child) {
+        display: none;
+    }
+
+    .topbar-link {
+        display: none;
+    }
+}
