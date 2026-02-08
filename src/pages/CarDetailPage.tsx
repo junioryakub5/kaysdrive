@@ -223,7 +223,17 @@ export const CarDetailPage = () => {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     href={agent ? `https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                                        `Hi, I'm interested in:\n\n${car.title}\nPrice: ₵${car.price.toLocaleString()}\nYear: ${car.year}\nMileage: ${car.mileage.toLocaleString()} mi\nLocation: ${car.city}\n\nView: ${window.location.href}\n\nI'd like to ${car.status === 'sale' ? 'make an offer' : 'book this vehicle'}.`
+                                        `Hi, I'm interested in:
+
+${car.title}
+Price: ₵${car.price.toLocaleString()}
+Year: ${car.year}
+Mileage: ${car.mileage.toLocaleString()} mi
+Location: ${car.city}
+
+View: ${window.location.href}
+
+I'd like to ${car.status === 'sale' ? 'make an offer' : 'book this vehicle'}.`
                                     )}` : '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -234,7 +244,16 @@ export const CarDetailPage = () => {
 
                                 <a
                                     href={agent ? `https://wa.me/${agent.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                                        `Hi, I'd like to schedule a test drive for:\n\n${car.title}\nPrice: ₵${car.price.toLocaleString()}\nYear: ${car.year}\nLocation: ${car.city}\n\nView: ${window.location.href}\n\nWhen would be a good time?`
+                                        `Hi, I'd like to schedule a test drive for:
+
+${car.title}
+Price: ₵${car.price.toLocaleString()}
+Year: ${car.year}
+Location: ${car.city}
+
+View: ${window.location.href}
+
+When would be a good time?`
                                     )}` : '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
