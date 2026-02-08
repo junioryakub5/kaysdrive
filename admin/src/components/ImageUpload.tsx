@@ -31,7 +31,7 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
                 formData.append('images', file);
             });
 
-            const response = await fetch('http://localhost:3001/api/upload/multiple', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/upload/multiple`, {
                 method: 'POST',
                 body: formData,
             });
