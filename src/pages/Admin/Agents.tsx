@@ -206,19 +206,19 @@ export default function Agents() {
                             <div className="modal-body">
                                 <div className="form-group">
                                     <label className="form-label">Name</label>
-                                    <input className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                                    <input className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g., John Smith" required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Role</label>
-                                    <input className="form-input" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} required />
+                                    <input className="form-input" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} placeholder="e.g., Senior Sales Agent" required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Phone</label>
-                                    <input className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
+                                    <input className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+1 (555) 123-4567" required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Email</label>
-                                    <input type="email" className="form-input" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
+                                    <input type="email" className="form-input" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="agent@kaysdrive.com" required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Avatar Photo</label>
@@ -261,7 +261,7 @@ export default function Agents() {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Bio</label>
-                                    <textarea className="form-textarea" value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} />
+                                    <textarea className="form-textarea" value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} placeholder="Brief bio about the agent's experience and expertise..." />
                                 </div>
                                 {!editingAgent && (
                                     <div className="form-group">

@@ -154,7 +154,7 @@ export default function MyCars() {
                                             </div>
                                         </td>
                                         <td>
-                                            ${car.price.toLocaleString()}
+                                            ₵{car.price.toLocaleString()}
                                             {car.priceType !== 'FIXED' && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> /{car.priceType.replace('PER_', '').toLowerCase()}</span>}
                                         </td>
                                         <td>
@@ -190,7 +190,7 @@ export default function MyCars() {
                                             <h4 className="car-card-title">{car.title}</h4>
                                             <p className="car-card-meta">{car.manufacturer} • {car.year}</p>
                                             <p className="car-card-price">
-                                                ${car.price.toLocaleString()}
+                                                ₵{car.price.toLocaleString()}
                                                 {car.priceType !== 'FIXED' && <span> /{car.priceType.replace('PER_', '').toLowerCase()}</span>}
                                             </p>
                                         </div>
@@ -226,11 +226,11 @@ export default function MyCars() {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div className="form-group">
                                         <label className="form-label">Title</label>
-                                        <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                                        <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="e.g., Porsche 911 GT3" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Price</label>
-                                        <input type="number" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: +e.target.value })} required />
+                                        <input type="number" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: +e.target.value })} placeholder="Enter amount" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Price Type</label>
@@ -265,11 +265,11 @@ export default function MyCars() {
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Year</label>
-                                        <input type="number" className="form-input" value={form.year} onChange={e => setForm({ ...form, year: +e.target.value })} required />
+                                        <input type="number" className="form-input" value={form.year} onChange={e => setForm({ ...form, year: +e.target.value })} placeholder="e.g., 2024" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Mileage</label>
-                                        <input type="number" className="form-input" value={form.mileage} onChange={e => setForm({ ...form, mileage: +e.target.value })} required />
+                                        <input type="number" className="form-input" value={form.mileage} onChange={e => setForm({ ...form, mileage: +e.target.value })} placeholder="e.g., 12000" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Engine</label>
@@ -298,7 +298,7 @@ export default function MyCars() {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Description</label>
-                                    <textarea className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required />
+                                    <textarea className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Describe the vehicle's features, condition, and highlights..." required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Car Images</label>

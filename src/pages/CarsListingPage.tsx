@@ -337,8 +337,8 @@ export const CarsListingPage = () => {
                                             image={car.images[0]}
                                             badge={car.status === 'sale' ? 'SALE' : 'RENT'}
                                             price={car.priceType === 'fixed'
-                                                ? `GHC ${car.price.toLocaleString()}`
-                                                : `GHC ${car.price.toLocaleString()}`
+                                                ? `₵${car.price.toLocaleString()}`
+                                                : `₵${car.price.toLocaleString()}`
                                             }
                                             priceType={car.priceType === 'per_week' ? '/ per week' : car.priceType === 'per_month' ? '/ per month' : undefined}
                                             title={car.title}

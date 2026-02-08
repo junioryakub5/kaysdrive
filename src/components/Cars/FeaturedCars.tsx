@@ -76,7 +76,7 @@ export const FeaturedCars = () => {
                             <CarCard
                                 image={car.images[0] || '/images/porsche-911.png'}
                                 badge={car.status as 'SALE' | 'RENT'}
-                                price={`GHC ${car.price.toLocaleString()}`}
+                                price={`₵${car.price.toLocaleString()}`}
                                 priceType={car.priceType === 'PER_WEEK' ? '/ per week' : car.priceType === 'PER_MONTH' ? '/ per month' : undefined}
                                 title={car.title}
                                 category={car.category}

@@ -156,7 +156,7 @@ export default function Cars() {
                                     </div>
                                 </td>
                                 <td>
-                                    ${car.price.toLocaleString()}
+                                    ₵{car.price.toLocaleString()}
                                     {car.priceType !== 'FIXED' && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> /{car.priceType.replace('PER_', '').toLowerCase()}</span>}
                                 </td>
                                 <td>
@@ -197,7 +197,7 @@ export default function Cars() {
                                     <h4 className="car-card-title">{car.title}</h4>
                                     <p className="car-card-meta">{car.manufacturer} • {car.year}</p>
                                     <p className="car-card-price">
-                                        ${car.price.toLocaleString()}
+                                        ₵{car.price.toLocaleString()}
                                         {car.priceType !== 'FIXED' && <span> /{car.priceType.replace('PER_', '').toLowerCase()}</span>}
                                     </p>
                                 </div>
@@ -236,15 +236,15 @@ export default function Cars() {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div className="form-group">
                                         <label className="form-label">Title</label>
-                                        <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                                        <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="e.g., Porsche 911 GT3" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Slug</label>
-                                        <input className="form-input" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} required />
+                                        <input className="form-input" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} placeholder="e.g., porsche-911-gt3" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Price</label>
-                                        <input type="number" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: +e.target.value })} required />
+                                        <input type="number" className="form-input" value={form.price} onChange={e => setForm({ ...form, price: +e.target.value })} placeholder="Enter amount" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Price Type</label>
@@ -275,19 +275,19 @@ export default function Cars() {
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Manufacturer</label>
-                                        <input className="form-input" value={form.manufacturer} onChange={e => setForm({ ...form, manufacturer: e.target.value })} required />
+                                        <input className="form-input" value={form.manufacturer} onChange={e => setForm({ ...form, manufacturer: e.target.value })} placeholder="e.g., Porsche, BMW, Audi" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Year</label>
-                                        <input type="number" className="form-input" value={form.year} onChange={e => setForm({ ...form, year: +e.target.value })} required />
+                                        <input type="number" className="form-input" value={form.year} onChange={e => setForm({ ...form, year: +e.target.value })} placeholder="e.g., 2024" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Mileage</label>
-                                        <input type="number" className="form-input" value={form.mileage} onChange={e => setForm({ ...form, mileage: +e.target.value })} required />
+                                        <input type="number" className="form-input" value={form.mileage} onChange={e => setForm({ ...form, mileage: +e.target.value })} placeholder="e.g., 12000" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Engine</label>
-                                        <input className="form-input" value={form.engine} onChange={e => setForm({ ...form, engine: e.target.value })} required />
+                                        <input className="form-input" value={form.engine} onChange={e => setForm({ ...form, engine: e.target.value })} placeholder="e.g., 3.8L Twin-Turbo V8" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Fuel</label>
@@ -307,7 +307,7 @@ export default function Cars() {
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">City</label>
-                                        <input className="form-input" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} required />
+                                        <input className="form-input" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="e.g., Chicago, Detroit, Seattle" required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Agent</label>
@@ -318,7 +318,7 @@ export default function Cars() {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Description</label>
-                                    <textarea className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required />
+                                    <textarea className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Describe the vehicle's features, condition, and highlights..." required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Car Images</label>
@@ -330,7 +330,10 @@ export default function Cars() {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Features (one per line)</label>
-                                    <textarea className="form-textarea" value={form.features.join('\n')} onChange={e => setForm({ ...form, features: e.target.value.split('\n') })} />
+                                    <textarea className="form-textarea" value={form.features.join('\n')} onChange={e => setForm({ ...form, features: e.target.value.split('\n') })} placeholder="e.g., Leather Interior
+Navigation System
+Parking Sensors
+Sunroof" />
                                 </div>
                             </div>
                             <div className="modal-footer">

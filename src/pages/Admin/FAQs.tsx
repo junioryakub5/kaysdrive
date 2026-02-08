@@ -160,11 +160,11 @@ export default function FAQs() {
                             <div className="modal-body">
                                 <div className="form-group">
                                     <label className="form-label">Question</label>
-                                    <input className="form-input" value={form.question} onChange={e => setForm({ ...form, question: e.target.value })} required />
+                                    <input className="form-input" value={form.question} onChange={e => setForm({ ...form, question: e.target.value })} placeholder="e.g., How do I schedule a test drive?" required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Answer</label>
-                                    <textarea className="form-textarea" value={form.answer} onChange={e => setForm({ ...form, answer: e.target.value })} required />
+                                    <textarea className="form-textarea" value={form.answer} onChange={e => setForm({ ...form, answer: e.target.value })} placeholder="Provide a clear and helpful answer..." required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Category</label>

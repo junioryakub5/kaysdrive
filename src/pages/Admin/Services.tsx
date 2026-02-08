@@ -155,19 +155,21 @@ export default function Services() {
                             <div className="modal-body">
                                 <div className="form-group">
                                     <label className="form-label">Title</label>
-                                    <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                                    <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="e.g., Engine Repair" required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Icon (engine, wheel, tools, shield, dollar, sparkle)</label>
-                                    <input className="form-input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} required />
+                                    <input className="form-input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} placeholder="Choose: engine, wheel, tools, shield, dollar, or sparkle" required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Description</label>
-                                    <textarea className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required />
+                                    <textarea className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Brief description of the service..." required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Features (one per line)</label>
-                                    <textarea className="form-textarea" value={form.features.join('\n')} onChange={e => setForm({ ...form, features: e.target.value.split('\n') })} />
+                                    <textarea className="form-textarea" value={form.features.join('\n')} onChange={e => setForm({ ...form, features: e.target.value.split('\n') })} placeholder="e.g., Free Diagnostics
+Expert Technicians
+90-Day Warranty" />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Sort Order</label>

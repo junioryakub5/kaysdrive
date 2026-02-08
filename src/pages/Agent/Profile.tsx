@@ -185,6 +185,7 @@ export default function Profile() {
                             className="form-input"
                             value={form.name}
                             onChange={e => setForm({ ...form, name: e.target.value })}
+                            placeholder="Your full name"
                             required
                         />
                     </div>
@@ -195,6 +196,7 @@ export default function Profile() {
                             className="form-input"
                             value={form.role}
                             onChange={e => setForm({ ...form, role: e.target.value })}
+                            placeholder="Your job title"
                             required
                         />
                     </div>
@@ -205,6 +207,7 @@ export default function Profile() {
                             className="form-input"
                             value={form.phone}
                             onChange={e => setForm({ ...form, phone: e.target.value })}
+                            placeholder="+1 (555) 123-4567"
                             required
                         />
                     </div>
