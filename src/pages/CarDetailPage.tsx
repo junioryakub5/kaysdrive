@@ -166,19 +166,24 @@ export const CarDetailPage = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Location Placeholder */}
+                            {/* Location Map */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 }}
                             >
                                 <h3 className="text-xl font-bold mb-4">Location</h3>
-                                <div className="bg-gray-100 rounded-xl h-64 flex items-center justify-center">
-                                    <div className="text-center text-gray-500">
-                                        <FiMapPin className="w-12 h-12 mx-auto mb-2" />
-                                        <p>{car.city}</p>
-                                        <p className="text-sm">Map integration placeholder</p>
-                                    </div>
+                                <div className="rounded-xl overflow-hidden h-64 relative">
+                                    <iframe
+                                        src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(car.city)}`}
+                                        width="100%"
+                                        height="100%"
+                                        style={{ border: 0 }}
+                                        allowFullScreen
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                        title={`${car.city} location map`}
+                                    />
                                 </div>
                             </motion.div>
                         </div>
