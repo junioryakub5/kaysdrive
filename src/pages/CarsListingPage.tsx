@@ -24,7 +24,7 @@ export const CarsListingPage = () => {
     useEffect(() => {
         const initialFilters: CarFilters = {};
         if (searchParams.get('status')) initialFilters.status = searchParams.get('status') as any;
-        if (searchParams.get('category')) initialFilters.type = searchParams.get('category') as any;
+        if (searchParams.get('type')) initialFilters.type = searchParams.get('type') as any;
         if (searchParams.get('manufacturer')) initialFilters.manufacturer = searchParams.get('manufacturer') as any;
         if (searchParams.get('city')) initialFilters.city = searchParams.get('city') as any;
         setFilters(initialFilters);
