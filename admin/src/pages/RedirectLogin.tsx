@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 export default function RedirectToFrontend() {
     useEffect(() => {
-        window.location.href = 'http://localhost:5173/admin-login';
+        window.location.href = `${window.location.origin}/admin-login`;
     }, []);
 
     return (
