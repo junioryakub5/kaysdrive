@@ -759,28 +759,47 @@
 /* Modal - Responsive */
 @media (max-width: 640px) {
     .modal-overlay {
-        padding: 0.5rem;
-        align-items: flex-end;
+        padding: 1rem;
+        align-items: center;
+        /* Keep modals centered instead of bottom-aligned */
     }
 
     .modal {
-        max-width: 100%;
+        max-width: 95%;
+        /* 95% width instead of 100% for professional look */
         max-height: 85vh;
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        /* Ensure it doesn't cover the entire screen */
+        border-radius: var(--radius-lg);
+        /* Consistent rounded corners on all sides */
+    }
+
+    .modal-lg {
+        max-width: 95%;
+        /* Large modals also get professional spacing */
     }
 
     .modal-header {
-        padding: 1rem;
+        padding: 1rem 1.25rem;
+        flex-shrink: 0;
+        /* Prevent header from shrinking */
     }
 
     .modal-body {
-        padding: 1rem;
+        padding: 1rem 1.25rem;
+        overflow-y: auto;
+        /* Enable scrolling for overflowing content */
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scrolling on iOS */
+        max-height: calc(85vh - 140px);
+        /* Subtract header + footer height */
     }
 
     .modal-footer {
-        padding: 0.75rem 1rem;
+        padding: 1rem 1.25rem;
         flex-direction: column-reverse;
         gap: 0.5rem;
+        flex-shrink: 0;
+        /* Prevent footer from shrinking */
     }
 
     .modal-footer .btn {
