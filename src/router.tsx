@@ -1,31 +1,34 @@
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import { HomePage } from './pages/HomePage';
-import { CarsListingPage } from './pages/CarsListingPage';
-import { CarDetailPage } from './pages/CarDetailPage';
-import { AboutPage } from './pages/AboutPage';
-import { ServicesPage } from './pages/ServicesPage';
-import { AgentsPage } from './pages/AgentsPage';
-import { ContactPage } from './pages/ContactPage';
-import { FAQPage } from './pages/FAQPage';
-import { AdminLogin } from './pages/AdminLogin';
-import { AgentLogin } from './pages/AgentLogin';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import AdminLayout from './components/Admin/AdminLayout';
 import AgentLayout from './components/Agent/AgentLayout';
 
-// Admin Pages
-import AdminDashboard from './pages/Admin/Dashboard';
-import AdminCars from './pages/Admin/Cars';
-import AdminAgents from './pages/Admin/Agents';
-import AdminContacts from './pages/Admin/Contacts';
-import AdminServices from './pages/Admin/Services';
-import AdminFAQs from './pages/Admin/FAQs';
+// Lazy load heavy pages
+const CarsListingPage = lazy(() => import('./pages/CarsListingPage'));
+const CarDetailPage = lazy(() => import('./pages/CarDetailPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ServicesPage = lazy(() => import('./pages/ServicesPage'));
+const AgentsPage = lazy(() => import('./pages/AgentsPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const AgentLogin = lazy(() => import('./pages/AgentLogin'));
 
-// Agent Pages
-import AgentDashboard from './pages/Agent/Dashboard';
-import AgentMyCars from './pages/Agent/MyCars';
-import AgentProfile from './pages/Agent/Profile';
+// Admin Pages (Lazy loaded)
+const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
+const AdminCars = lazy(() => import('./pages/Admin/Cars'));
+const AdminAgents = lazy(() => import('./pages/Admin/Agents'));
+const AdminContacts = lazy(() => import('./pages/Admin/Contacts'));
+const AdminServices = lazy(() => import('./pages/Admin/Services'));
+const AdminFAQs = lazy(() => import('./pages/Admin/FAQs'));
+
+// Agent Pages (Lazy loaded)
+const AgentDashboard = lazy(() => import('./pages/Agent/Dashboard'));
+const AgentMyCars = lazy(() => import('./pages/Agent/MyCars'));
+const AgentProfile = lazy(() => import('./pages/Agent/Profile'));
 
 export const router = createBrowserRouter([
     {
