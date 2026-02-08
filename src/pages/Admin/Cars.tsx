@@ -16,7 +16,7 @@ export default function Cars() {
         slug: '',
         price: 0,
         priceType: 'fixed',
-        status: 'sale',
+        status: 'foreign_used',
         category: '',
         manufacturer: '',
         year: new Date().getFullYear(),
@@ -67,7 +67,7 @@ export default function Cars() {
         } else {
             setEditingCar(null);
             setForm({
-                title: '', slug: '', price: 0, priceType: 'fixed', status: 'sale',
+                title: '', slug: '', price: 0, priceType: 'fixed', status: 'foreign_used',
                 category: '', manufacturer: '', year: new Date().getFullYear(), mileage: 0,
                 engine: '', fuel: 'gasoline', transmission: 'automatic', city: '',
                 description: '', agentId: agents[0]?.id || '', images: [''], features: [''],
@@ -160,7 +160,7 @@ export default function Cars() {
                                     {car.priceType !== 'FIXED' && <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> /{car.priceType.replace('PER_', '').toLowerCase()}</span>}
                                 </td>
                                 <td>
-                                    <span className={`badge ${car.status === 'SALE' ? 'badge-success' : 'badge-info'}`}>
+                                    <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>
                                         {car.status}
                                     </span>
                                 </td>
@@ -214,7 +214,7 @@ export default function Cars() {
                                     </label>
                                 </div>
                                 <div className="car-card-actions">
-                                    <span className={`badge ${car.status === 'SALE' ? 'badge-success' : 'badge-info'}`}>{car.status}</span>
+                                    <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>{car.status}</span>
                                     <button className="action-btn" onClick={() => openModal(car)}>✏️</button>
                                     <button className="action-btn danger" onClick={() => handleDelete(car)}>🗑️</button>
                                 </div>
@@ -256,9 +256,9 @@ export default function Cars() {
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Status</label>
-                                        <select className="form-select" value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
-                                            <option value="sale">For Sale</option>
-                                            <option value="rent">For Rent</option>
+                                        <select className="form-select" value={form.status} onChange={e => setForm({ ...form, status: e.target.value })} required>
+                                            <option value="foreign_used">Foreign Used</option>
+                                            <option value="ghana_used">Ghana Used</option>
                                         </select>
                                     </div>
                                     <div className="form-group">

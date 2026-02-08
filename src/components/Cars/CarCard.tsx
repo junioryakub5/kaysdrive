@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 interface CarCardProps {
     image: string;
-    badge?: 'SALE' | 'RENT';
+    badge?: 'SALE' | 'RENT' | 'FOREIGN_USED' | 'GHANA_USED' | 'FOREIGN USED' | 'GHANA USED';
     price: string;
     priceType?: string;
     title: string;

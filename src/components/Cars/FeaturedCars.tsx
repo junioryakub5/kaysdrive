@@ -75,7 +75,7 @@ export const FeaturedCars = () => {
                         <motion.div key={car.id} variants={itemVariants}>
                             <CarCard
                                 image={car.images[0] || '/images/porsche-911.png'}
-                                badge={car.status as 'SALE' | 'RENT'}
+                                badge={car.status as 'FOREIGN_USED' | 'GHANA_USED'}
                                 price={`₵${car.price.toLocaleString()}`}
                                 priceType={car.priceType === 'PER_WEEK' ? '/ per week' : car.priceType === 'PER_MONTH' ? '/ per month' : undefined}
                                 title={car.title}

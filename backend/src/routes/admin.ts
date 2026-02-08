@@ -140,7 +140,7 @@ adminRouter.post('/cars', authMiddleware, async (req: Request, res: Response, ne
                 images: stringifyJson(images || []),
                 features: stringifyJson(features || []),
                 priceType: priceType?.toUpperCase() || 'FIXED',
-                status: status?.toUpperCase() || 'SALE',
+                status: status?.toUpperCase() || 'FOREIGN_USED',
                 fuel: fuel?.toUpperCase() || 'GASOLINE',
                 transmission: transmission?.toUpperCase() || 'AUTOMATIC',
             },

@@ -97,8 +97,8 @@ export const CarsListingPage = () => {
                                     className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
                                 >
                                     <option value="">All Status</option>
-                                    <option value="sale">For Sale</option>
-                                    <option value="rent">For Rent</option>
+                                    <option value="foreign_used">Foreign Used</option>
+                                    <option value="ghana_used">Ghana Used</option>
                                 </select>
                             </div>
 
@@ -209,8 +209,8 @@ export const CarsListingPage = () => {
                                 className="px-4 py-2.5 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                             >
                                 <option value="">All Status</option>
-                                <option value="sale">For Sale</option>
-                                <option value="rent">For Rent</option>
+                                <option value="foreign_used">Foreign Used</option>
+                                <option value="ghana_used">Ghana Used</option>
                             </select>
 
                             <select
@@ -335,7 +335,7 @@ export const CarsListingPage = () => {
                                     >
                                         <CarCard
                                             image={car.images[0]}
-                                            badge={car.status === 'sale' ? 'SALE' : 'RENT'}
+                                            badge={car.status === 'foreign_used' ? 'FOREIGN USED' : 'GHANA USED'}
                                             price={car.priceType === 'fixed'
                                                 ? `₵${car.price.toLocaleString()}`
                                                 : `₵${car.price.toLocaleString()}`

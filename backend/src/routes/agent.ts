@@ -154,7 +154,7 @@ agentRouter.post('/cars', agentAuthMiddleware, async (req: AgentRequest, res) =>
                 title,
                 price: parseFloat(price),
                 priceType: priceType?.toUpperCase() || 'FIXED',
-                status: status?.toUpperCase() || 'SALE',
+                status: status?.toUpperCase() || 'FOREIGN_USED',
                 category,
                 manufacturer,
                 year: parseInt(year),

@@ -233,13 +233,13 @@ Location: ${car.city}
 
 View: ${window.location.href}
 
-I'd like to ${car.status === 'sale' ? 'make an offer' : 'book this vehicle'}.`
+I'd like to ${car.status === 'foreign_used' ? 'inquire about this vehicle' : 'book this vehicle'}.`
                                     )}` : '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="block w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-colors mb-3 text-center"
                                 >
-                                    {car.status === 'sale' ? 'Make an Offer' : 'Book Now'}
+                                    {car.status === 'foreign_used' ? 'Inquire Now' : 'Book Now'}
                                 </motion.a>
 
                                 <a
@@ -315,7 +315,7 @@ When would be a good time?`
                                 <CarCard
                                     key={similarCar.id}
                                     image={similarCar.images[0]}
-                                    badge={similarCar.status === 'sale' ? 'SALE' : 'RENT'}
+                                    badge={similarCar.status === 'foreign_used' ? 'FOREIGN USED' : 'GHANA USED'}
                                     price={`₵${similarCar.price.toLocaleString()}`}
                                     title={similarCar.title}
                                     category={similarCar.category}

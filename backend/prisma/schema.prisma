@@ -17,7 +17,7 @@ model Car {
   title        String
   price        Float
   priceType    String   @default("FIXED") // FIXED, PER_WEEK, PER_MONTH
-  status       String   @default("SALE") // SALE, RENT
+  status       String   @default("FOREIGN_USED") // FOREIGN_USED, GHANA_USED
   category     String
   manufacturer String
   year         Int
