@@ -1,7 +1,7 @@
 // Admin API Service
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api/admin';
+const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/admin`;
 
 // Type definitions
 export interface Stats {
@@ -118,7 +118,7 @@ export const adminApi = {
 };
 
 // Agent API Service
-const AGENT_API_URL = 'http://localhost:3001/api/agent';
+const AGENT_API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/agent`;
 
 export const agentApi = {
     getStats: () => axios.get(`${AGENT_API_URL}/stats`, { headers: getAgentAuthHeaders() }).then(res => res.data),

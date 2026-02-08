@@ -1,6 +1,7 @@
 import type { Car, CarFilters, Agent, Testimonial, Service, FAQ, Brand, ContactSubmission } from '../types';
 
-const API_BASE = 'http://localhost:3001/api';
+// Use environment variable for API, fallback to localhost for development
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 // =============================================================================
 // CARS API
