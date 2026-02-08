@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { carsApi } from '../../services/api';
 
 export const SearchBar = () => {
     const navigate = useNavigate();
@@ -10,6 +11,20 @@ export const SearchBar = () => {
         manufacturer: '',
         city: '',
     });
+    const [filterOptions, setFilterOptions] = useState({
+        manufacturers: [] as string[],
+        categories: [] as string[],
+        cities: [] as string[],
+    });
+
+    useEffect(() => {
+        loadFilterOptions();
+    }, []);
+
+    const loadFilterOptions = async () => {
+        const options = await carsApi.getFilters();
+        setFilterOptions(options);
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,10 +93,9 @@ export const SearchBar = () => {
                                 className="px-4 py-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                             >
                                 <option value="">All Types</option>
-                                <option value="Sedan">Sedan</option>
-                                <option value="SUV">SUV</option>
-                                <option value="Coupe">Coupe</option>
-                                <option value="Wagon">Wagon</option>
+                                {filterOptions.categories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
                             </motion.select>
                         </motion.div>
 
@@ -94,14 +108,9 @@ export const SearchBar = () => {
                                 className="px-4 py-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                             >
                                 <option value="">All Manufacturers</option>
-                                <option value="Porsche">Porsche</option>
-                                <option value="Audi">Audi</option>
-                                <option value="BMW">BMW</option>
-                                <option value="Mercedes-Benz">Mercedes-Benz</option>
-                                <option value="Ferrari">Ferrari</option>
-                                <option value="Lamborghini">Lamborghini</option>
-                                <option value="Bentley">Bentley</option>
-                                <option value="Tesla">Tesla</option>
+                                {filterOptions.manufacturers.map(mfr => (
+                                    <option key={mfr} value={mfr}>{mfr}</option>
+                                ))}
                             </motion.select>
                         </motion.div>
 
@@ -114,11 +123,9 @@ export const SearchBar = () => {
                                 className="px-4 py-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                             >
                                 <option value="">All Cities</option>
-                                <option value="Chicago">Chicago</option>
-                                <option value="Detroit">Detroit</option>
-                                <option value="Seattle">Seattle</option>
-                                <option value="New York">New York</option>
-                                <option value="Los Angeles">Los Angeles</option>
+                                {filterOptions.cities.map(city => (
+                                    <option key={city} value={city}>{city}</option>
+                                ))}
                             </motion.select>
                         </motion.div>
 
