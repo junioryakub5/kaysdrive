@@ -1,5 +1,6 @@
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
+import { CookieConsent } from './components/CookieConsent/CookieConsent';
 import { HeroSection } from './components/Hero/HeroSection';
 import { SearchBar } from './components/Search/SearchBar';
 import { FeaturedCars } from './components/Cars/FeaturedCars';
@@ -14,6 +15,7 @@ function App() {
   return (
     <div className="min-h-screen">
       <Header />
+      <CookieConsent />
       <HeroSection />
       <SearchBar />
       <FeaturedCars />
