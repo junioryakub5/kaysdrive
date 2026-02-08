@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const loginAdmin = async (email: string, password: string) => {
-        const response = await fetch('http://localhost:3001/api/admin/login', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/admin/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const loginAgent = async (email: string, password: string) => {
-        const response = await fetch('http://localhost:3001/api/agent/login', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/agent/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),

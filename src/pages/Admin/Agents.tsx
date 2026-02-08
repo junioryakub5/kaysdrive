@@ -60,7 +60,7 @@ export default function Agents() {
             const formData = new FormData();
             formData.append('images', file);
 
-            const response = await fetch('http://localhost:3001/api/upload/multiple', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/upload/multiple`, {
                 method: 'POST',
                 body: formData,
             });
@@ -68,7 +68,7 @@ export default function Agents() {
             if (!response.ok) throw new Error('Upload failed');
 
             const data = await response.json();
-            const avatarUrl = `http://localhost:3001${data.urls[0]}`;
+            const avatarUrl = `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${data.urls[0]}`;
             setForm({ ...form, avatar: avatarUrl });
         } catch (error) {
             console.error('Upload error:', error);
