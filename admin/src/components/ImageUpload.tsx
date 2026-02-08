@@ -8,7 +8,6 @@ interface ImageUploadProps {
 
 export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadProps) => {
     const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
