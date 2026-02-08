@@ -103,7 +103,7 @@ export const CarCard = ({
                         {title}
                     </h3>
                     <p className="text-text-secondary text-sm mb-4">
-                        {category} • {year}
+                        {category} • {year} • {transmission}
                     </p>
 
                     {/* Specs Row */}
