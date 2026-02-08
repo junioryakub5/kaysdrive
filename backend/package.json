@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "tsx watch src/index.ts",
         "build": "tsc && prisma generate",
+        "postbuild": "prisma migrate deploy && tsx prisma/seed.ts",
         "start": "node dist/index.js",
         "postinstall": "prisma generate",
         "db:generate": "prisma generate",
