@@ -21,18 +21,19 @@ export function Topbar({ type, sidebarCollapsed = false }: TopbarProps) {
         <header className={`topbar ${sidebarCollapsed ? 'collapsed-sidebar' : ''}`}>
             {/* Breadcrumb */}
             <nav className="breadcrumb">
-                <Link to={type === 'admin' ? '/admin' : '/agent'} className="breadcrumb-item">
+                <span className="breadcrumb-item">
                     🏠 Home
-                </Link>
+                </span>
                 <span className="breadcrumb-separator">/</span>
                 {pathSegments.map((segment, index) => {
                     const path = '/' + pathSegments.slice(0, index + 1).join('/');
                     const isLast = index === pathSegments.length - 1;
+                    const isFirst = index === 0; // Admin or Agent
                     const label = segment.charAt(0).toUpperCase() + segment.slice(1);
 
                     return (
                         <React.Fragment key={path}>
-                            {isLast ? (
+                            {isLast || isFirst ? (
                                 <span className="breadcrumb-current">{label}</span>
                             ) : (
                                 <>
