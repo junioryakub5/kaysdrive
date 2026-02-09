@@ -3,6 +3,7 @@
  * Displays key metrics with icon, label, and value
  */
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface StatCardProps {
     icon: React.ReactNode;
@@ -13,6 +14,7 @@ interface StatCardProps {
         isPositive: boolean;
     };
     color?: 'primary' | 'success' | 'warning' | 'danger';
+    link?: string; // Optional navigation link
 }
 
 const colorStyles = {
@@ -22,11 +24,11 @@ const colorStyles = {
     danger: { iconBg: '#fee2e2', iconColor: '#ef4444' },
 };
 
-export function StatCard({ icon, label, value, trend, color = 'primary' }: StatCardProps) {
+export function StatCard({ icon, label, value, trend, color = 'primary', link }: StatCardProps) {
     const styles = colorStyles[color];
 
-    return (
-        <div className="dashboard-card" style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+    const cardContent = (
+        <>
             {/* Icon */}
             <div
                 style={{
@@ -80,6 +82,43 @@ export function StatCard({ icon, label, value, trend, color = 'primary' }: StatC
                     </div>
                 )}
             </div>
+        </>
+    );
+
+    const baseStyle = {
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '1rem',
+        transition: 'all 0.2s ease',
+    };
+
+    if (link) {
+        return (
+            <Link
+                to={link}
+                className="dashboard-card"
+                style={{
+                    ...baseStyle,
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '';
+                }}
+            >
+                {cardContent}
+            </Link>
+        );
+    }
+
+    return (
+        <div className="dashboard-card" style={baseStyle}>
+            {cardContent}
         </div>
     );
 }

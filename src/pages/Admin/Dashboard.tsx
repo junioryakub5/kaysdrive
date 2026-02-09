@@ -40,24 +40,28 @@ export default function Dashboard() {
                     label="Total Cars"
                     value={stats?.totalCars || 0}
                     color="primary"
+                    link="/admin/cars"
                 />
                 <StatCard
                     icon="👥"
                     label="Active Agents"
                     value={stats?.totalAgents || 0}
                     color="success"
+                    link="/admin/agents"
                 />
                 <StatCard
                     icon="📧"
                     label="Total Contacts"
                     value={stats?.totalContacts || 0}
                     color="primary"
+                    link="/admin/contacts"
                 />
                 <StatCard
                     icon="📬"
                     label="Unread Messages"
                     value={stats?.unreadContacts || 0}
                     color={stats?.unreadContacts ? 'warning' : 'primary'}
+                    link="/admin/contacts"
                 />
             </div>
 
