@@ -21,7 +21,7 @@ export function Topbar({ type, sidebarCollapsed = false }: TopbarProps) {
         <header className={`topbar ${sidebarCollapsed ? 'collapsed-sidebar' : ''}`}>
             {/* Breadcrumb */}
             <nav className="breadcrumb">
-                <Link to="/" className="breadcrumb-item">
+                <Link to={type === 'admin' ? '/admin' : '/agent'} className="breadcrumb-item">
                     🏠 Home
                 </Link>
                 <span className="breadcrumb-separator">/</span>
