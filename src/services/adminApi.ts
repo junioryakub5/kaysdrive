@@ -15,8 +15,14 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             // Clear admin token and redirect to login
+            localStorage.removeItem('admin');
             localStorage.removeItem('admin_token');
-            window.location.href = '/admin-login';
+            // Dispatch custom event to notify auth context
+            window.dispatchEvent(new CustomEvent('admin-logout'));
+            // Redirect to login
+            if (!window.location.pathname.includes('/admin-login')) {
+                window.location.href = '/admin-login';
+            }
         }
         return Promise.reject(error);
     }
@@ -150,8 +156,15 @@ agentAxiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Clear agent token
+            localStorage.removeItem('agent');
             localStorage.removeItem('agent_token');
-            window.location.href = '/agent-login';
+            // Dispatch custom event to notify auth context
+            window.dispatchEvent(new CustomEvent('agent-logout'));
+            // Redirect to login
+            if (!window.location.pathname.includes('/agent-login')) {
+                window.location.href = '/agent-login';
+            }
         }
         return Promise.reject(error);
     }
