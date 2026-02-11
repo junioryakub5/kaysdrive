@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 // =============================================================================
-// MODELS (SQLite compatible - using String instead of enums)
+// MODELS (PostgreSQL compatible - using String instead of enums for flexibility)
 // =============================================================================
 
 model Car {
