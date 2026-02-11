@@ -520,3 +520,68 @@ adminRouter.put('/settings', authMiddleware, async (req: Request, res: Response,
         next(error);
     }
 });
+
+// =============================================================================
+// ANALYTICS
+// =============================================================================
+
+adminRouter.get('/analytics/stats', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        // Total page views
+        const totalPageViews = await prisma.pageView.count();
+
+        // Total unique visitors (unique IP hashes)
+        const uniqueVisitors = await prisma.pageView.groupBy({
+            by: ['ipHash'],
+        });
+
+        // Today's visitors
+        const todayVisitors = await prisma.pageView.groupBy({
+            by: ['ipHash'],
+            where: {
+                createdAt: { gte: todayStart },
+            },
+        });
+
+        // This week's visitors
+        const weekVisitors = await prisma.pageView.groupBy({
+            by: ['ipHash'],
+            where: {
+                createdAt: { gte: weekStart },
+            },
+        });
+
+        // Popular pages (top 10)
+        const pageViewsByPage = await prisma.pageView.groupBy({
+            by: ['page'],
+            _count: {
+                id: true,
+            },
+            orderBy: {
+                _count: {
+                    id: 'desc',
+                },
+            },
+            take: 10,
+        });
+
+        const popularPages = pageViewsByPage.map((p: any) => ({
+            page: p.page,
+            views: p._count.id,
+        }));
+
+        res.json({
+            totalPageViews,
+            totalVisitors: uniqueVisitors.length,
+            todayVisitors: todayVisitors.length,
+            weekVisitors: weekVisitors.length,
+            popularPages,
+        });
+    } catch (error) {
+        next(error);
+    }
+});

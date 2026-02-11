@@ -25,6 +25,7 @@ const adminNavItems: NavItem[] = [
     { path: '/admin/contacts', label: 'Contacts', icon: '📧' },
     { path: '/admin/services', label: 'Services', icon: '🔧' },
     { path: '/admin/faqs', label: 'FAQs', icon: '❓' },
+    { path: '/admin/testimonials', label: 'Testimonials', icon: '💬' },
 ];
 
 const agentNavItems: NavItem[] = [

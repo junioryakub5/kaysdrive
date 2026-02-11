@@ -5,6 +5,7 @@ import { FiPhone, FiMail, FiMapPin, FiCalendar, FiCheck } from 'react-icons/fi';
 import { FaGasPump, FaTachometerAlt, FaCog, FaRoad } from 'react-icons/fa';
 import { PageHero } from '../components/Common/PageHero';
 import { CarCard } from '../components/Cars/CarCard';
+import { ImageLightbox } from '../components/Common/ImageLightbox';
 import { carsApi, agentsApi } from '../services/api';
 import type { Car, Agent } from '../types';
 
@@ -15,6 +16,7 @@ export const CarDetailPage = () => {
     const [similarCars, setSimilarCars] = useState<Car[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
     useEffect(() => {
         loadCarData();
@@ -85,12 +87,20 @@ export const CarDetailPage = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="mb-8"
                             >
-                                <div className="aspect-video rounded-xl overflow-hidden mb-4">
+                                <div
+                                    className="aspect-video rounded-xl overflow-hidden mb-4 cursor-pointer group relative"
+                                    onClick={() => setIsLightboxOpen(true)}
+                                >
                                     <img
                                         src={car.images[selectedImage]}
                                         alt={car.title}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
+                                            Click to view full size
+                                        </div>
+                                    </div>
                                 </div>
                                 {car.images.length > 1 && (
                                     <div className="flex gap-4 overflow-x-auto pb-2">
@@ -233,13 +243,13 @@ Location: ${car.city}
 
 View: ${window.location.href}
 
-I'd like to ${car.status === 'foreign_used' ? 'inquire about this vehicle' : 'book this vehicle'}.`
+I'd like to make an offer on this vehicle.`
                                     )}` : '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="block w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-colors mb-3 text-center"
                                 >
-                                    {car.status === 'foreign_used' ? 'Inquire Now' : 'Book Now'}
+                                    Make an Offer
                                 </motion.a>
 
                                 <a
@@ -333,6 +343,17 @@ When would be a good time?`
                         </div>
                     </div>
                 </section>
+            )}
+
+            {/* Image Lightbox */}
+            {car && (
+                <ImageLightbox
+                    isOpen={isLightboxOpen}
+                    onClose={() => setIsLightboxOpen(false)}
+                    images={car.images}
+                    initialIndex={selectedImage}
+                    onIndexChange={setSelectedImage}
+                />
             )}
         </>
     );

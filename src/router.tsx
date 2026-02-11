@@ -24,6 +24,7 @@ const AdminAgents = lazy(() => import('./pages/Admin/Agents'));
 const AdminContacts = lazy(() => import('./pages/Admin/Contacts'));
 const AdminServices = lazy(() => import('./pages/Admin/Services'));
 const AdminFAQs = lazy(() => import('./pages/Admin/FAQs'));
+const AdminTestimonials = lazy(() => import('./pages/Admin/Testimonials'));
 
 // Agent Pages (Lazy loaded)
 const AgentDashboard = lazy(() => import('./pages/Agent/Dashboard'));
@@ -109,6 +110,10 @@ export const router = createBrowserRouter([
             {
                 path: 'faqs',
                 element: <AdminFAQs />,
+            },
+            {
+                path: 'testimonials',
+                element: <AdminTestimonials />,
             },
         ],
     },

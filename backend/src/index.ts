@@ -8,6 +8,7 @@ import { publicRouter } from './routes/public.js';
 import { adminRouter } from './routes/admin.js';
 import { agentRouter } from './routes/agent.js';
 import { uploadRouter } from './routes/upload.js';
+import analyticsRouter from './routes/analytics.js';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api', publicRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/agent', agentRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/analytics', analyticsRouter);
 
 
 // Error handler

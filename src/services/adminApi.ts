@@ -94,6 +94,25 @@ export interface FAQ {
     order: number;
 }
 
+export interface Testimonial {
+    id: string;
+    name: string;
+    role: string;
+    avatar?: string;
+    content: string;
+    rating: number;
+    isActive: boolean;
+}
+
+export interface AnalyticsStats {
+    totalPageViews: number;
+    totalVisitors: number;
+    todayVisitors: number;
+    weekVisitors: number;
+    popularPages: { page: string; views: number }[];
+}
+
+
 // Auth headers helper
 const getAdminAuthHeaders = () => ({
     'Content-Type': 'application/json',
@@ -140,6 +159,15 @@ export const adminApi = {
     createFAQ: (data: any) => axiosInstance.post('/faqs', data, { headers: getAdminAuthHeaders() }).then(res => res.data),
     updateFAQ: (id: string, data: any) => axiosInstance.put(`/faqs/${id}`, data, { headers: getAdminAuthHeaders() }).then(res => res.data),
     deleteFAQ: (id: string) => axiosInstance.delete(`/faqs/${id}`, { headers: getAdminAuthHeaders() }).then(res => res.data),
+
+    // Testimonials
+    getTestimonials: () => axiosInstance.get('/testimonials', { headers: getAdminAuthHeaders() }).then(res => res.data),
+    createTestimonial: (data: any) => axiosInstance.post('/testimonials', data, { headers: getAdminAuthHeaders() }).then(res => res.data),
+    updateTestimonial: (id: string, data: any) => axiosInstance.put(`/testimonials/${id}`, data, { headers: getAdminAuthHeaders() }).then(res => res.data),
+    deleteTestimonial: (id: string) => axiosInstance.delete(`/testimonials/${id}`, { headers: getAdminAuthHeaders() }).then(res => res.data),
+
+    // Analytics
+    getAnalyticsStats: () => axiosInstance.get('/analytics/stats', { headers: getAdminAuthHeaders() }).then(res => res.data),
 };
 
 // Agent API Service

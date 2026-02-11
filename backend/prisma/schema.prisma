@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -128,6 +128,19 @@ model SiteSettings {
   email    String @default("")
   address  String @default("")
   socials  String @default("[]") // JSON array
+}
+
+model PageView {
+  id        String   @id @default(uuid())
+  ipHash    String   // Hashed IP for privacy
+  userAgent String?  // Browser user agent
+  page      String   // Page URL/path
+  referrer  String?  // Where they came from
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([page])
+  @@index([ipHash, createdAt])
 }
 
 model Admin {

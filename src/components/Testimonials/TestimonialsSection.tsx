@@ -3,6 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { testimonialsApi } from '../../services/api';
 import type { Testimonial } from '../../types';
 
+// Default user icon SVG
+const UserIcon = () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: '100%', height: '100%', color: '#fff' }}>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+    </svg>
+);
+
 export function TestimonialsSection() {
     const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
     const [loading, setLoading] = useState(true);
@@ -100,15 +107,31 @@ export function TestimonialsSection() {
                                 </p>
 
                                 <div className="flex items-center gap-4">
-                                    <motion.img
-                                        key={`avatar-${currentIndex}`}
-                                        initial={{ scale: 0.8, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{ duration: 0.3, delay: 0.2 }}
-                                        src={testimonials[currentIndex].avatar || 'https://randomuser.me/api/portraits/men/32.jpg'}
-                                        alt={testimonials[currentIndex].name}
-                                        className="w-14 h-14 rounded-full object-cover"
-                                    />
+                                    <div style={{
+                                        width: '56px',
+                                        height: '56px',
+                                        borderRadius: '50%',
+                                        overflow: 'hidden',
+                                        backgroundColor: '#3b82f6',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0
+                                    }}>
+                                        {testimonials[currentIndex].avatar ? (
+                                            <motion.img
+                                                key={`avatar-${currentIndex}`}
+                                                initial={{ scale: 0.8, opacity: 0 }}
+                                                animate={{ scale: 1, opacity: 1 }}
+                                                transition={{ duration: 0.3, delay: 0.2 }}
+                                                src={testimonials[currentIndex].avatar}
+                                                alt={testimonials[currentIndex].name}
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <UserIcon />
+                                        )}
+                                    </div>
                                     <div>
                                         <h4 className="font-semibold text-gray-900">
                                             {testimonials[currentIndex].name}
