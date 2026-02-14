@@ -5,6 +5,7 @@ import { FaTools, FaCar, FaWrench, FaOilCan } from 'react-icons/fa';
 import { IoSettingsSharp } from 'react-icons/io5';
 import { servicesApi } from '../../services/api';
 import type { Service } from '../../types';
+import { Link } from 'react-router-dom';
 
 export function ServicesSection() {
     const [services, setServices] = useState<Service[]>([]);
@@ -125,17 +126,19 @@ export function ServicesSection() {
                             </motion.div>
                         )}
 
-                        <motion.button
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="mt-8 bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-                        >
-                            About Us
-                        </motion.button>
+                        <Link to="/about">
+                            <motion.button
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: 0.4 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="mt-8 bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                            >
+                                About Us
+                            </motion.button>
+                        </Link>
                     </motion.div>
                 </div>
             </div>
