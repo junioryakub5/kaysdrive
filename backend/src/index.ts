@@ -13,7 +13,12 @@ import analyticsRouter from './routes/analytics.js';
 const app = express();
 
 // Middleware - Allow frontend, admin, and agent portal origins
-const allowedOrigins = config.corsOrigin ? config.corsOrigin.split(',') : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+const allowedOrigins = config.corsOrigin
+    ? config.corsOrigin.split(',').map(origin => origin.trim())
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+
+console.log('🔐 Allowed CORS Origins:', allowedOrigins);
+
 app.use(cors({
     origin: allowedOrigins,
     credentials: true,
