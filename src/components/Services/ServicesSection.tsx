@@ -73,7 +73,7 @@ export function ServicesSection() {
                             transition={{ duration: 0.5, delay: 0.3 }}
                             className="absolute -bottom-6 -right-6 bg-blue-600 text-white p-6 rounded-lg shadow-lg"
                         >
-                            <div className="text-4xl font-bold">20+</div>
+                            <div className="text-4xl font-bold">3+</div>
                             <div className="text-sm">Years Experience</div>
                         </motion.div>
                     </motion.div>
