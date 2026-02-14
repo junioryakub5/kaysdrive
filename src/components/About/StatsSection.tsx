@@ -31,9 +31,9 @@ function CountUp({ end, suffix = '' }: { end: number; suffix?: string }) {
 
 export const StatsSection = () => {
     const stats = [
-        { value: 5000, suffix: '+', label: 'Cars Sold' },
-        { value: 4800, suffix: '+', label: 'Happy Customers' },
-        { value: 20, suffix: '+', label: 'Years Experience' },
+        { value: 150, suffix: '+', label: 'Cars Sold' },
+        { value: 265, suffix: '+', label: 'Happy Customers' },
+        { value: 3, suffix: '+', label: 'Years Experience' },
         { value: 200, suffix: '+', label: 'Vehicles in Stock' },
     ];
 

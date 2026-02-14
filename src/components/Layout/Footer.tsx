@@ -75,7 +75,7 @@ export const Footer = () => {
                             >
                                 <FiMail className="w-4 h-4 text-primary" />
                                 <span className="text-gray-400 hover:text-white transition-colors">
-                                    issahanif18@gmail.com
+                                    hanifissa18@gmail.com
                                 </span>
                             </motion.div>
                         </div>

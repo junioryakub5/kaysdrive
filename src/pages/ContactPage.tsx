@@ -106,7 +106,7 @@ export const ContactPage = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-semibold mb-1">Email</h4>
-                                        <p className="text-gray-600">issahanif18@gmail.com</p>
+                                        <p className="text-gray-600">hanifissa18@gmail.com</p>
                                     </div>
                                 </div>
 
