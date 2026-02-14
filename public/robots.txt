@@ -1,0 +1,12 @@
+# robots.txt for kaysdrive.com
+User-agent: *
+Allow: /
+
+# Disallow admin and agent areas
+Disallow: /admin/
+Disallow: /agent/
+Disallow: /admin-login
+Disallow: /agent-login
+
+# Sitemap location
+Sitemap: https://kaysdrive.com/sitemap.xml
