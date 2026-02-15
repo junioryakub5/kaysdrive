@@ -320,25 +320,37 @@ When would be a good time?`
                 <section className="py-16 bg-background">
                     <div className="max-w-7xl mx-auto px-6">
                         <h2 className="text-2xl font-bold mb-8">Similar Vehicles</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div
+                            className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory"
+                            style={{
+                                scrollbarWidth: 'none',
+                                msOverflowStyle: 'none',
+                                WebkitOverflowScrolling: 'touch',
+                            }}
+                        >
                             {similarCars.map((similarCar) => (
-                                <CarCard
+                                <div
                                     key={similarCar.id}
-                                    image={similarCar.images[0]}
-                                    badge={similarCar.status === 'foreign_used' ? 'FOREIGN USED' : 'GHANA USED'}
-                                    price={`₵${similarCar.price.toLocaleString()}`}
-                                    title={similarCar.title}
-                                    category={similarCar.category}
-                                    year={similarCar.year.toString()}
-                                    mileage={`${(similarCar.mileage / 1000).toFixed(0)}k mi`}
-                                    engine={similarCar.engine}
-                                    fuel={similarCar.fuel}
-                                    transmission={similarCar.transmission}
-                                    city={similarCar.city}
-                                    slug={similarCar.slug}
-                                    agent={similarCar.agent?.name || 'Agent'}
-                                    date={new Date(similarCar.createdAt).toLocaleDateString()}
-                                />
+                                    className="flex-shrink-0 snap-start"
+                                    style={{ width: 'min(340px, 80vw)' }}
+                                >
+                                    <CarCard
+                                        image={similarCar.images[0]}
+                                        badge={similarCar.status === 'foreign_used' ? 'FOREIGN USED' : 'GHANA USED'}
+                                        price={`₵${similarCar.price.toLocaleString()}`}
+                                        title={similarCar.title}
+                                        category={similarCar.category}
+                                        year={similarCar.year.toString()}
+                                        mileage={`${(similarCar.mileage / 1000).toFixed(0)}k mi`}
+                                        engine={similarCar.engine}
+                                        fuel={similarCar.fuel}
+                                        transmission={similarCar.transmission}
+                                        city={similarCar.city}
+                                        slug={similarCar.slug}
+                                        agent={similarCar.agent?.name || 'Agent'}
+                                        date={new Date(similarCar.createdAt).toLocaleDateString()}
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
