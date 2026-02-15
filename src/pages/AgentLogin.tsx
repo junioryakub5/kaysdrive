@@ -123,13 +123,6 @@ export const AgentLogin = () => {
                             <FiArrowRight className="w-5 h-5" />
                         </motion.button>
                     </form>
-
-                    {/* Help Text */}
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-500">
-                            Example: sarah.williams@carz.com / test123
-                        </p>
-                    </div>
                 </motion.div>
 
                 {/* Back Link */}
