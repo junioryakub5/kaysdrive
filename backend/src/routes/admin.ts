@@ -6,6 +6,7 @@ import { config } from '../utils/config.js';
 import { authMiddleware, type AuthRequest } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
 import type { Request, Response, NextFunction } from 'express';
+import { loginLimiter } from '../middleware/rateLimiter.js';
 
 export const adminRouter = Router();
 
@@ -25,7 +26,7 @@ const parseJsonArray = (str: string): any[] => {
 // AUTH
 // =============================================================================
 
-adminRouter.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+adminRouter.post('/login', loginLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { email, password } = req.body;
 

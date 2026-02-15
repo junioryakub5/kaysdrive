@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma.js';
 import { config } from '../utils/config.js';
 import { agentAuthMiddleware, type AgentRequest } from '../middleware/agentAuth.js';
+import { loginLimiter } from '../middleware/rateLimiter.js';
 
 export const agentRouter = Router();
 
@@ -15,7 +16,7 @@ const parseCarFields = (car: any) => ({
 });
 
 // Agent login
-agentRouter.post('/login', async (req, res) => {
+agentRouter.post('/login', loginLimiter, async (req, res) => {
     try {
         console.log('Agent login attempt:', req.body.email);
         const { email, password } = req.body;
