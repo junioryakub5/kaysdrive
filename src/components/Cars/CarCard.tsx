@@ -40,6 +40,11 @@ export const CarCard = ({
 }: CarCardProps) => {
     const carLink = slug ? `/cars/${slug}` : '#';
 
+    // Format badge text for display
+    const formatBadge = (b: string) => b.replace(/_/g, ' ').toUpperCase();
+
+    const fallbackImg = 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=600&h=400&fit=crop';
+
     return (
         <Link to={carLink}>
             <motion.div
@@ -54,7 +59,8 @@ export const CarCard = ({
                         transition={{ duration: 0.4 }}
                         src={image}
                         alt={title}
-                        className="w-full h-64 object-cover"
+                        className="w-full h-48 sm:h-64 object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).src = fallbackImg; }}
                     />
 
                     {/* Badge */}
@@ -66,7 +72,7 @@ export const CarCard = ({
                             className={`absolute top-4 left-4 ${badge === 'SALE' ? 'bg-red-500' : 'bg-blue-500'
                                 } text-white px-3 py-1 rounded text-xs font-bold`}
                         >
-                            {badge}
+                            {formatBadge(badge)}
                         </motion.div>
                     )}
 

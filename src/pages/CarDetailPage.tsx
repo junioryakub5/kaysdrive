@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiPhone, FiMail, FiMapPin, FiCalendar, FiCheck, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiPhone, FiMail, FiMapPin, FiCalendar, FiCheck } from 'react-icons/fi';
 import { FaGasPump, FaTachometerAlt, FaCog, FaRoad } from 'react-icons/fa';
 import { PageHero } from '../components/Common/PageHero';
 import { CarCard } from '../components/Cars/CarCard';
@@ -17,35 +17,6 @@ export const CarDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
-
-    const checkScrollability = useCallback(() => {
-        const el = scrollRef.current;
-        if (!el) return;
-        setCanScrollLeft(el.scrollLeft > 0);
-        setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
-    }, []);
-
-    useEffect(() => {
-        const el = scrollRef.current;
-        if (!el) return;
-        checkScrollability();
-        el.addEventListener('scroll', checkScrollability);
-        window.addEventListener('resize', checkScrollability);
-        return () => {
-            el.removeEventListener('scroll', checkScrollability);
-            window.removeEventListener('resize', checkScrollability);
-        };
-    }, [similarCars, checkScrollability]);
-
-    const scroll = (direction: 'left' | 'right') => {
-        const el = scrollRef.current;
-        if (!el) return;
-        const amount = 360;
-        el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
-    };
 
     useEffect(() => {
         loadCarData();
@@ -348,33 +319,8 @@ When would be a good time?`
             {similarCars.length > 0 && (
                 <section className="py-16 bg-background">
                     <div className="max-w-7xl mx-auto px-6">
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-2xl font-bold">Similar Vehicles</h2>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => scroll('left')}
-                                    disabled={!canScrollLeft}
-                                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${canScrollLeft
-                                            ? 'border-gray-300 text-gray-700 hover:bg-primary hover:text-white hover:border-primary'
-                                            : 'border-gray-200 text-gray-300 cursor-not-allowed'
-                                        }`}
-                                >
-                                    <FiChevronLeft className="w-5 h-5" />
-                                </button>
-                                <button
-                                    onClick={() => scroll('right')}
-                                    disabled={!canScrollRight}
-                                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${canScrollRight
-                                            ? 'border-gray-300 text-gray-700 hover:bg-primary hover:text-white hover:border-primary'
-                                            : 'border-gray-200 text-gray-300 cursor-not-allowed'
-                                        }`}
-                                >
-                                    <FiChevronRight className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
+                        <h2 className="text-2xl font-bold mb-8">Similar Vehicles</h2>
                         <div
-                            ref={scrollRef}
                             className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory"
                             style={{
                                 scrollbarWidth: 'none',

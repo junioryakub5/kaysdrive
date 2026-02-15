@@ -59,7 +59,7 @@ export const SearchBar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="bg-background-alt py-8 search-filters"
+            className="bg-background-alt py-4 md:py-8 search-filters"
         >
             <div className="max-w-7xl mx-auto px-6">
                 <form onSubmit={handleSearch}>
@@ -68,7 +68,7 @@ export const SearchBar = () => {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true }}
-                        className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end"
+                        className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4 items-end"
                     >
                         <motion.div variants={itemVariants} className="flex flex-col gap-2">
                             <label className="text-sm font-medium text-text-secondary">Status</label>
@@ -134,7 +134,7 @@ export const SearchBar = () => {
                             variants={itemVariants}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                            className="col-span-2 md:col-span-1 bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors"
                         >
                             Search
                         </motion.button>
