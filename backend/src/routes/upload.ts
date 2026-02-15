@@ -1,21 +1,19 @@
 import express, { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import path from 'path';
-import { randomUUID } from 'crypto';
+import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
 
 const uploadRouter = express.Router();
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        // Generate unique filename: uuid-timestamp-originalname.ext
-        const uniqueName = `${randomUUID()}-${Date.now()}${path.extname(file.originalname)}`;
-        cb(null, uniqueName);
-    },
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dhkh8a7ba',
+    api_key: process.env.CLOUDINARY_API_KEY || '874294128447885',
+    api_secret: process.env.CLOUDINARY_API_SECRET || 'wTXoYBLHVhk6PzPge7ax0X-rQHg',
 });
+
+// Use memory storage instead of disk (for Cloudinary upload)
+const storage = multer.memoryStorage();
 
 // File filter to only accept images
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
@@ -35,26 +33,59 @@ const upload = multer({
     },
 });
 
-// Upload single image
-uploadRouter.post('/single', upload.single('image'), (req: Request, res: Response) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
-    }
+// Helper: Upload buffer to Cloudinary
+const uploadToCloudinary = (buffer: Buffer, folder: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: `kaysdrive/${folder}`,
+                resource_type: 'image',
+                transformation: [
+                    { width: 1200, height: 800, crop: 'limit', quality: 'auto', fetch_format: 'auto' },
+                ],
+            },
+            (error, result) => {
+                if (error) return reject(error);
+                if (result) return resolve(result.secure_url);
+                reject(new Error('Upload failed'));
+            }
+        );
+        const readable = Readable.from(buffer);
+        readable.pipe(uploadStream);
+    });
+};
 
-    const imageUrl = `/uploads/${req.file.filename}`;
-    res.json({ url: imageUrl });
+// Upload single image
+uploadRouter.post('/single', upload.single('image'), async (req: Request, res: Response) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const imageUrl = await uploadToCloudinary(req.file.buffer, 'cars');
+        res.json({ url: imageUrl });
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ error: 'Failed to upload image' });
+    }
 });
 
 // Upload multiple images (max 10)
-uploadRouter.post('/multiple', upload.array('images', 10), (req: Request, res: Response) => {
-    if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
-        return res.status(400).json({ error: 'No files uploaded' });
+uploadRouter.post('/multiple', upload.array('images', 10), async (req: Request, res: Response) => {
+    try {
+        if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
+            return res.status(400).json({ error: 'No files uploaded' });
+        }
+
+        const files = req.files as Express.Multer.File[];
+        const uploadPromises = files.map(file => uploadToCloudinary(file.buffer, 'cars'));
+        const imageUrls = await Promise.all(uploadPromises);
+
+        res.json({ urls: imageUrls });
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ error: 'Failed to upload images' });
     }
-
-    const files = req.files as Express.Multer.File[];
-    const imageUrls = files.map(file => `/uploads/${file.filename}`);
-
-    res.json({ urls: imageUrls });
 });
 
 // Error handling middleware for multer
