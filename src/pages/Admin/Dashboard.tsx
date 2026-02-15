@@ -4,6 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FiTruck, FiUsers, FiMail, FiInbox, FiBarChart2 } from 'react-icons/fi';
 import { adminApi as api, type Stats, type AnalyticsStats } from '../../services/adminApi';
 import { PageHeader, StatCard } from '../../components/Dashboard/UI';
 
@@ -43,28 +44,28 @@ export default function Dashboard() {
             {/* Stats Grid */}
             <div className="stats-grid">
                 <StatCard
-                    icon="🚘"
+                    icon={<FiTruck className="w-6 h-6" />}
                     label="Total Cars"
                     value={stats?.totalCars || 0}
                     color="primary"
                     link="/admin/cars"
                 />
                 <StatCard
-                    icon="👥"
+                    icon={<FiUsers className="w-6 h-6" />}
                     label="Active Agents"
                     value={stats?.totalAgents || 0}
                     color="success"
                     link="/admin/agents"
                 />
                 <StatCard
-                    icon="📧"
+                    icon={<FiMail className="w-6 h-6" />}
                     label="Total Contacts"
                     value={stats?.totalContacts || 0}
                     color="primary"
                     link="/admin/contacts"
                 />
                 <StatCard
-                    icon="📬"
+                    icon={<FiInbox className="w-6 h-6" />}
                     label="Unread Messages"
                     value={stats?.unreadContacts || 0}
                     color={stats?.unreadContacts ? 'warning' : 'primary'}
@@ -74,7 +75,7 @@ export default function Dashboard() {
 
             {/* Visitor Analytics Section */}
             <div className="dashboard-card" style={{ marginTop: '2rem' }}>
-                <h3 className="section-title">📊 Visitor Analytics</h3>
+                <h3 className="section-title"><FiBarChart2 className="inline mr-2" /> Visitor Analytics</h3>
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -180,13 +181,13 @@ export default function Dashboard() {
                 <h3 className="section-title">Quick Actions</h3>
                 <div className="quick-actions">
                     <Link to="/admin/cars" className="btn btn-primary">
-                        🚘 Manage Cars
+                        <FiTruck className="inline mr-2" /> Manage Cars
                     </Link>
                     <Link to="/admin/agents" className="btn btn-secondary">
-                        👥 Manage Agents
+                        <FiUsers className="inline mr-2" /> Manage Agents
                     </Link>
                     <Link to="/admin/contacts" className="btn btn-secondary">
-                        📧 View Contacts
+                        <FiMail className="inline mr-2" /> View Contacts
                     </Link>
                 </div>
             </div>

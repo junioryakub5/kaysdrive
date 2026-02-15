@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FiTruck } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Login() {
@@ -25,7 +26,7 @@ export default function Login() {
     return (
         <div className="login-container">
             <div className="login-card">
-                <div className="login-logo">🚗 Carz</div>
+                <div className="login-logo"><FiTruck className="inline mr-2" style={{ fontSize: '1.5rem' }} /> Carz</div>
                 <p className="login-subtitle">Admin Dashboard</p>
 
                 {error && <div className="login-error">{error}</div>}

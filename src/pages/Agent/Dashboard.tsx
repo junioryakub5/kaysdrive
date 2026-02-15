@@ -4,6 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FiTruck, FiCheckCircle, FiEdit, FiPlus } from 'react-icons/fi';
 import { agentApi as api } from '../../services/adminApi';
 import { PageHeader, StatCard } from '../../components/Dashboard/UI';
 
@@ -47,19 +48,19 @@ export default function AgentDashboard() {
             {/* Stats Grid */}
             <div className="stats-grid">
                 <StatCard
-                    icon="🚘"
+                    icon={<FiTruck className="w-6 h-6" />}
                     label="My Vehicles"
                     value={stats?.totalCars || 0}
                     color="primary"
                 />
                 <StatCard
-                    icon="✅"
+                    icon={<FiCheckCircle className="w-6 h-6" />}
                     label="Published"
                     value={stats?.publishedCars || 0}
                     color="success"
                 />
                 <StatCard
-                    icon="📝"
+                    icon={<FiEdit className="w-6 h-6" />}
                     label="Drafts"
                     value={stats?.draftCars || 0}
                     color="warning"
@@ -71,10 +72,10 @@ export default function AgentDashboard() {
                 <h3 className="section-title">Quick Actions</h3>
                 <div className="quick-actions">
                     <Link to="/agent/cars" className="btn btn-primary">
-                        🚘 View My Cars
+                        <FiTruck className="inline mr-2" /> View My Cars
                     </Link>
                     <Link to="/agent/cars?new=true" className="btn btn-secondary">
-                        ➕ Add Vehicle
+                        <FiPlus className="inline mr-2" /> Add Vehicle
                     </Link>
                 </div>
             </div>

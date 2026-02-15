@@ -22,9 +22,9 @@ export const AboutPage = () => {
                             transition={{ duration: 0.6 }}
                         >
                             <img
-                                src="/images/about-showroom.png"
-                                alt="Kays Drive - Ghana's Trusted Automotive Marketplace"
-                                className="rounded-xl shadow-2xl bg-white p-8"
+                                src="/images/team-photo.jpg"
+                                alt="Kays Drive Team - Professional Automotive Experts"
+                                className="rounded-xl shadow-2xl w-full h-auto object-cover"
                             />
                         </motion.div>
 
