@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiMapPin, FiPhone, FiMail, FiFacebook, FiTwitter, FiInstagram } from 'react-icons/fi';
+import { FiMapPin, FiPhone, FiMail, FiFacebook, FiInstagram } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
 export const Footer = () => {
@@ -130,17 +130,38 @@ export const Footer = () => {
                         © 2026 Kays Drive. All rights reserved.
                     </p>
                     <div className="flex gap-4">
-                        {[FiFacebook, FiTwitter, FiInstagram].map((Icon, index) => (
-                            <motion.a
-                                key={index}
-                                href="#"
-                                whileHover={{ scale: 1.2, y: -3 }}
-                                whileTap={{ scale: 0.9 }}
-                                className="text-gray-400 hover:text-white transition-colors"
-                            >
-                                <Icon className="w-5 h-5" />
-                            </motion.a>
-                        ))}
+                        <motion.a
+                            href="https://www.facebook.com/share/1Bxs6DpWf5/?mibextid=wwXIfr"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.2, y: -3 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            <FiFacebook className="w-5 h-5" />
+                        </motion.a>
+                        <motion.a
+                            href="https://www.instagram.com/kaysdrive247?igsh=MTluenVncmc2NDVrbw%3D%3D&utm_source=qr"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.2, y: -3 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            <FiInstagram className="w-5 h-5" />
+                        </motion.a>
+                        <motion.a
+                            href="https://www.tiktok.com/@kaysdrive?_r=1&_t=ZS-93vcWCeOItx"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.2, y: -3 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.73a8.19 8.19 0 004.76 1.52V6.79a4.84 4.84 0 01-1-.1z" />
+                            </svg>
+                        </motion.a>
                     </div>
                 </motion.div>
             </motion.div>
