@@ -1,31 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const faqs = [
-    {
-        question: 'Can I return a vehicle for a refund?',
-        answer: 'Yes, we offer a 7-day money-back guarantee on all vehicle purchases. If you are not completely satisfied with your purchase, you can return the vehicle within 7 days for a full refund, subject to our terms and conditions.',
-    },
-    {
-        question: 'Do you offer financing options?',
-        answer: 'Absolutely! We partner with multiple financial institutions to offer competitive financing rates. Our finance team will work with you to find the best option that fits your budget and credit profile.',
-    },
-    {
-        question: 'Are your vehicles inspected before sale?',
-        answer: 'Every vehicle in our inventory undergoes a comprehensive 150-point inspection by our certified technicians. We ensure all vehicles meet our high standards for quality and safety before they are offered for sale.',
-    },
-    {
-        question: 'Do you offer warranty on used cars?',
-        answer: 'Yes, all our certified pre-owned vehicles come with a minimum 12-month/12,000-mile warranty. Extended warranty options are also available for additional peace of mind.',
-    },
-    {
-        question: 'Can I trade in my current vehicle?',
-        answer: 'We accept trade-ins! Bring your vehicle in for a free appraisal, and we will offer you a competitive price that can be applied directly to your next purchase.',
-    },
-];
+import { faqApi } from '../../services/api';
+import type { FAQ } from '../../types';
 
 export function FAQSection() {
+    const [faqs, setFaqs] = useState<FAQ[]>([]);
+    const [loading, setLoading] = useState(true);
     const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+    useEffect(() => {
+        loadFAQs();
+    }, []);
+
+    const loadFAQs = async () => {
+        try {
+            const data = await faqApi.getAll();
+            // Show only first 5 FAQs on homepage
+            setFaqs(data.slice(0, 5));
+        } catch (error) {
+            console.error('Failed to load FAQs:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const toggleFAQ = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
@@ -47,6 +44,32 @@ export function FAQSection() {
             transition: { duration: 0.4 },
         },
     };
+
+    if (loading) {
+        return (
+            <section className="py-20 bg-white overflow-hidden">
+                <div className="max-w-3xl mx-auto px-4">
+                    <div className="text-center mb-12">
+                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                            Frequently Asked Questions
+                        </h2>
+                        <p className="text-gray-600">
+                            Find answers to the most common questions about our services and policies.
+                        </p>
+                    </div>
+                    <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (faqs.length === 0) {
+        return null; // Don't show section if no FAQs
+    }
 
     return (
         <section className="py-20 bg-white overflow-hidden">
@@ -75,7 +98,7 @@ export function FAQSection() {
                 >
                     {faqs.map((faq, index) => (
                         <motion.div
-                            key={index}
+                            key={faq.id}
                             variants={itemVariants}
                             className="border border-gray-200 rounded-lg overflow-hidden"
                         >
@@ -88,7 +111,7 @@ export function FAQSection() {
                                 <motion.svg
                                     animate={{ rotate: openIndex === index ? 180 : 0 }}
                                     transition={{ duration: 0.3 }}
-                                    className="w-5 h-5 text-gray-500"
+                                    className="w-5 h-5 text-gray-500 flex-shrink-0 ml-4"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
