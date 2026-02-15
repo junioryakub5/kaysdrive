@@ -53,13 +53,13 @@ export const CarCard = ({
                 className="bg-white rounded-card overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group cursor-pointer"
             >
                 {/* Image Section */}
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden aspect-[16/10]">
                     <motion.img
                         whileHover={{ scale: 1.08 }}
                         transition={{ duration: 0.4 }}
                         src={image}
                         alt={title}
-                        className="w-full h-48 sm:h-64 object-cover"
+                        className="w-full h-full object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).src = fallbackImg; }}
                     />
 
