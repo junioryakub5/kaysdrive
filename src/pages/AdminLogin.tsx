@@ -72,7 +72,7 @@ export const AdminLogin = () => {
                                     type="email"
                                     value={credentials.email}
                                     onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                                    placeholder="admin@carz.com"
+                                    placeholder="junioryakub5@gmail.com"
                                     className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                                     required
                                 />
@@ -120,7 +120,7 @@ export const AdminLogin = () => {
                     {/* Help Text */}
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-500">
-                            Default: admin@carz.com / admin123
+                            Default: junioryakub5@gmail.com / Jacob@2001
                         </p>
                     </div>
                 </motion.div>
