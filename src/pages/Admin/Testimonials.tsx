@@ -86,7 +86,11 @@ export default function Testimonials() {
             if (!response.ok) throw new Error('Upload failed');
 
             const data = await response.json();
-            const imageUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${data.url}`;
+            // Cloudinary returns absolute URLs, don't prepend backend URL
+            let imageUrl = data.url;
+            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+                imageUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${imageUrl}`;
+            }
 
             setForm({ ...form, avatar: imageUrl });
             setAvatarPreview(imageUrl);

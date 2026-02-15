@@ -39,7 +39,15 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
             if (!response.ok) throw new Error('Upload failed');
 
             const data = await response.json();
-            const newImageUrls = data.urls.map((url: string) => `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${url}`);
+            // Cloudinary returns absolute URLs, don't prepend backend URL
+            const newImageUrls = data.urls.map((url: string) => {
+                // If URL is already absolute (starts with http:// or https://), use it as is
+                if (url.startsWith('http://') || url.startsWith('https://')) {
+                    return url;
+                }
+                // Otherwise, prepend the backend URL for relative paths like /uploads/...
+                return `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${url}`;
+            });
             onChange([...images, ...newImageUrls]);
         } catch (error) {
             console.error('Upload error:', error);

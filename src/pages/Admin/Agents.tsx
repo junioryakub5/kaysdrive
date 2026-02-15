@@ -68,7 +68,11 @@ export default function Agents() {
             if (!response.ok) throw new Error('Upload failed');
 
             const data = await response.json();
-            const avatarUrl = `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${data.urls[0]}`;
+            // Cloudinary returns absolute URLs, don't prepend backend URL
+            let avatarUrl = data.urls[0];
+            if (!avatarUrl.startsWith('http://') && !avatarUrl.startsWith('https://')) {
+                avatarUrl = `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${avatarUrl}`;
+            }
             setForm({ ...form, avatar: avatarUrl });
         } catch (error) {
             console.error('Upload error:', error);
