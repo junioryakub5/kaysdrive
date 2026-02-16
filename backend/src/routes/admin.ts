@@ -133,11 +133,32 @@ adminRouter.get('/cars/:id', authMiddleware, async (req: Request, res: Response,
 
 adminRouter.post('/cars', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { images, features, priceType, status, fuel, transmission, ...data } = req.body;
+        const { images, features, priceType, status, fuel, transmission, slug, ...data } = req.body;
+
+        // Validate and ensure unique slug
+        let uniqueSlug = slug;
+        const existingCar = await prisma.car.findUnique({
+            where: { slug: uniqueSlug },
+        });
+
+        if (existingCar) {
+            // Auto-generate unique slug by appending number
+            let counter = 2;
+            let newSlug = `${slug}-${counter}`;
+
+            while (await prisma.car.findUnique({ where: { slug: newSlug } })) {
+                counter++;
+                newSlug = `${slug}-${counter}`;
+            }
+
+            uniqueSlug = newSlug;
+            console.log(`Slug '${slug}' already exists. Auto-generated unique slug: '${uniqueSlug}'`);
+        }
 
         const car = await prisma.car.create({
             data: {
                 ...data,
+                slug: uniqueSlug,
                 images: stringifyJson(images || []),
                 features: stringifyJson(features || []),
                 priceType: priceType?.toUpperCase() || 'FIXED',
@@ -147,7 +168,11 @@ adminRouter.post('/cars', authMiddleware, async (req: Request, res: Response, ne
             },
         });
 
-        res.status(201).json(car);
+        res.status(201).json({
+            ...car,
+            _slugWasModified: uniqueSlug !== slug,
+            _originalSlug: slug,
+        });
     } catch (error) {
         next(error);
     }
