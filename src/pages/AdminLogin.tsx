@@ -85,7 +85,7 @@ export const AdminLogin = () => {
                                     type="email"
                                     value={credentials.email}
                                     onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
-                                    placeholder="junioryakub5@gmail.com"
+                                    placeholder="example@gmail.com"
                                     className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                                     required
                                 />
