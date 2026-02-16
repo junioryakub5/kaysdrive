@@ -5,6 +5,7 @@ import { agentsApi } from '../services/api';
 import type { Agent } from '../types';
 import { FiPhone, FiMail } from 'react-icons/fi';
 import { FaFacebook, FaTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa';
+import { SEO } from '../components/SEO/SEO';
 
 const socialIcons: { [key: string]: React.ComponentType<{ className?: string }> } = {
     facebook: FaFacebook,
@@ -29,6 +30,12 @@ export const AgentsPage = () => {
 
     return (
         <>
+            <SEO
+                title="Meet Our Agents | Expert Car Sales Team at Kay's Drive"
+                description="Connect with Kay's Drive professional car sales agents in Kumasi, Ghana. Expert guidance from our dedicated team to help you find your perfect vehicle."
+                keywords="car sales agents, automotive professionals Kumasi, car dealership team, Kay's Drive agents"
+                canonical="https://kaysdrive.com/agents"
+            />
             <PageHero
                 title="Our Agents"
                 breadcrumbs={[{ label: 'Our Agents' }]}

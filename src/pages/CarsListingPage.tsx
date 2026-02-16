@@ -6,6 +6,7 @@ import { PageHero } from '../components/Common/PageHero';
 import { CarCard } from '../components/Cars/CarCard';
 import { carsApi } from '../services/api';
 import type { Car, CarFilters } from '../types';
+import { SEO } from '../components/SEO/SEO';
 
 export const CarsListingPage = () => {
     const [searchParams] = useSearchParams();
@@ -59,6 +60,12 @@ export const CarsListingPage = () => {
 
     return (
         <>
+            <SEO
+                title="Browse All Cars for Sale | Kay's Drive Car Dealership Kumasi"
+                description="Browse our complete inventory of quality used cars in Kumasi, Ghana. Filter by price, manufacturer, condition, and location. Foreign used and Ghana used vehicles available."
+                keywords="browse cars Ghana, used cars for sale, car inventory Kumasi, filter cars by price, buy used cars Ghana"
+                canonical="https://kaysdrive.com/cars"
+            />
             <PageHero
                 title="All Cars"
                 breadcrumbs={[{ label: 'All Cars' }]}
