@@ -135,8 +135,21 @@ adminRouter.post('/cars', authMiddleware, async (req: Request, res: Response, ne
     try {
         const { images, features, priceType, status, fuel, transmission, slug, ...data } = req.body;
 
+        // Sanitize slug: trim, lowercase, replace spaces with hyphens, remove special chars
+        const sanitizeSlug = (str: string): string => {
+            return str
+                .trim()                           // Remove leading/trailing spaces
+                .toLowerCase()                    // Convert to lowercase
+                .replace(/\s+/g, '-')            // Replace spaces with hyphens
+                .replace(/[^\w\-]+/g, '')        // Remove special characters except hyphens
+                .replace(/\-\-+/g, '-')          // Replace multiple hyphens with single
+                .replace(/^-+/, '')              // Remove leading hyphens
+                .replace(/-+$/, '');             // Remove trailing hyphens
+        };
+
         // Validate and ensure unique slug
-        let uniqueSlug = slug;
+        let uniqueSlug = sanitizeSlug(slug);
+        const originalSlug = slug;
         const existingCar = await prisma.car.findUnique({
             where: { slug: uniqueSlug },
         });
@@ -144,15 +157,15 @@ adminRouter.post('/cars', authMiddleware, async (req: Request, res: Response, ne
         if (existingCar) {
             // Auto-generate unique slug by appending number
             let counter = 2;
-            let newSlug = `${slug}-${counter}`;
+            let newSlug = `${uniqueSlug}-${counter}`;
 
             while (await prisma.car.findUnique({ where: { slug: newSlug } })) {
                 counter++;
-                newSlug = `${slug}-${counter}`;
+                newSlug = `${uniqueSlug}-${counter}`;
             }
 
+            console.log(`Slug '${uniqueSlug}' already exists. Auto-generated unique slug: '${newSlug}'`);
             uniqueSlug = newSlug;
-            console.log(`Slug '${slug}' already exists. Auto-generated unique slug: '${uniqueSlug}'`);
         }
 
         const car = await prisma.car.create({
@@ -170,8 +183,9 @@ adminRouter.post('/cars', authMiddleware, async (req: Request, res: Response, ne
 
         res.status(201).json({
             ...car,
-            _slugWasModified: uniqueSlug !== slug,
-            _originalSlug: slug,
+            _slugWasModified: uniqueSlug !== originalSlug,
+            _originalSlug: originalSlug,
+            _sanitizedSlug: uniqueSlug,
         });
     } catch (error) {
         next(error);
