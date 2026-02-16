@@ -4,6 +4,7 @@ import { PageHero } from '../components/Common/PageHero';
 import { contactApi } from '../services/api';
 import type { ContactSubmission } from '../types';
 import { FiPhone, FiMail, FiClock, FiCheck } from 'react-icons/fi';
+import { SEO } from '../components/SEO/SEO';
 
 export const ContactPage = () => {
     const [formData, setFormData] = useState<ContactSubmission>({
@@ -43,6 +44,12 @@ export const ContactPage = () => {
 
     return (
         <>
+            <SEO
+                title="Contact Kay's Drive | Get in Touch with Our Team in Kumasi"
+                description="Contact Kay's Drive car dealership in Kumasi, Ghana. Phone: +233 248 538 335 | Email: hanifissa18@gmail.com. Open Mon-Sat 9AM-7PM. Visit us or send a message today!"
+                keywords="contact Kay's Drive, car dealership Kumasi contact, buy cars Ghana, automotive inquiries"
+                canonical="https://kaysdrive.com/contact"
+            />
             <PageHero
                 title="Contact Us"
                 breadcrumbs={[{ label: 'Contact' }]}

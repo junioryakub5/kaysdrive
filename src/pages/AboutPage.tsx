@@ -2,10 +2,17 @@ import { motion } from 'framer-motion';
 import { PageHero } from '../components/Common/PageHero';
 import { StatsSection } from '../components/About/StatsSection';
 import { FiCheck, FiAward, FiUsers, FiThumbsUp } from 'react-icons/fi';
+import { SEO } from '../components/SEO/SEO';
 
 export const AboutPage = () => {
     return (
         <>
+            <SEO
+                title="About Kay's Drive | Premium Car Dealership in Kumasi, Ghana"
+                description="Learn about Kay's Drive, Kumasi's trusted car dealership. 3+ years experience, 150+ cars sold, 265+ happy customers. Quality vehicles with transparent pricing and professional service."
+                keywords="about Kay's Drive, car dealership Kumasi, used cars Ghana, automotive marketplace Ghana"
+                canonical="https://kaysdrive.com/about"
+            />
             <PageHero
                 title="About Us"
                 breadcrumbs={[{ label: 'About Us' }]}
