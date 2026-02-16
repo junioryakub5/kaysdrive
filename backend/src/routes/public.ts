@@ -94,9 +94,9 @@ publicRouter.get('/cars/filters', async (_req: Request, res: Response, next: Nex
         });
 
         res.json({
-            manufacturers: [...new Set(cars.map(c => c.manufacturer))],
-            categories: [...new Set(cars.map(c => c.category))],
-            cities: [...new Set(cars.map(c => c.city))],
+            manufacturers: [...new Set(cars.map(c => c.manufacturer.trim()))].filter(Boolean).sort(),
+            categories: [...new Set(cars.map(c => c.category.trim()))].filter(Boolean).sort(),
+            cities: [...new Set(cars.map(c => c.city.trim()))].filter(Boolean).sort(),
             years: [...new Set(cars.map(c => c.year))].sort((a, b) => b - a),
         });
     } catch (error) {
