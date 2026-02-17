@@ -93,7 +93,7 @@ export const CarDetailPage = () => {
                                 >
                                     <img
                                         src={car.images[selectedImage]}
-                                        alt={car.title}
+                                        alt={`${car.title} - ${car.status === 'foreign_used' ? 'Foreign Used' : 'Ghana Used'} car for sale at Kay's Drive in ${car.city}, Ghana`}
                                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
@@ -111,7 +111,7 @@ export const CarDetailPage = () => {
                                                 className={`flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === idx ? 'border-primary' : 'border-transparent'
                                                     }`}
                                             >
-                                                <img src={img} alt="" className="w-full h-full object-cover" />
+                                                <img src={img} alt={`${car.title} - View ${idx + 1}`} className="w-full h-full object-cover" />
                                             </button>
                                         ))}
                                     </div>
