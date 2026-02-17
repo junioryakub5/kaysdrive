@@ -44,7 +44,10 @@ publicRouter.get('/cars', async (req: Request, res: Response, next: NextFunction
             where.status = (status as string).toUpperCase();
         }
         if (type) where.category = type;
-        if (manufacturer) where.manufacturer = manufacturer;
+        if (manufacturer) {
+            // Use case-insensitive contains to handle trailing spaces and case variations
+            where.manufacturer = { contains: (manufacturer as string).trim(), mode: 'insensitive' };
+        }
         if (city) where.city = city;
         if (fuel) where.fuel = (fuel as string).toUpperCase();
         if (transmission) where.transmission = (transmission as string).toUpperCase();
