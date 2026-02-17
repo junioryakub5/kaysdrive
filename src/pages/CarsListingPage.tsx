@@ -89,7 +89,7 @@ export const CarsListingPage = () => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-semibold">Filters</h3>
+                            <h2 className="text-lg font-semibold">Filters</h2>
                             <button onClick={() => setShowFilters(false)} className="p-2 hover:bg-gray-100 rounded-lg">
                                 <FiX className="w-5 h-5" />
                             </button>
