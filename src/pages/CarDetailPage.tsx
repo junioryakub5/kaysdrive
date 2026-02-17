@@ -8,6 +8,7 @@ import { CarCard } from '../components/Cars/CarCard';
 import { ImageLightbox } from '../components/Common/ImageLightbox';
 import { carsApi, agentsApi } from '../services/api';
 import type { Car, Agent } from '../types';
+import { CarSchema } from '../components/SEO/CarSchema';
 
 export const CarDetailPage = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -68,6 +69,7 @@ export const CarDetailPage = () => {
 
     return (
         <>
+            <CarSchema car={car} />
             <PageHero
                 title={car.title}
                 breadcrumbs={[
