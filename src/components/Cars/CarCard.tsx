@@ -58,7 +58,7 @@ export const CarCard = ({
                         whileHover={{ scale: 1.08 }}
                         transition={{ duration: 0.4 }}
                         src={image}
-                        alt={title}
+                        alt={`${title} for sale in ${city}, Ghana - Kay's Drive`}
                         className="w-full h-full object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).src = fallbackImg; }}
                     />
