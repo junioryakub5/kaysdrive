@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiPhone, FiMail, FiMapPin, FiCalendar, FiCheck } from 'react-icons/fi';
+import { FiPhone, FiMail, FiMapPin, FiCalendar, FiCheck, FiDownload } from 'react-icons/fi';
+import { downloadAllWithWatermark } from '../utils/downloadWithWatermark';
 import { FaGasPump, FaTachometerAlt, FaCog, FaRoad } from 'react-icons/fa';
 import { PageHero } from '../components/Common/PageHero';
 import { CarCard } from '../components/Cars/CarCard';
@@ -18,6 +19,7 @@ export const CarDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(0);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const [downloadProgress, setDownloadProgress] = useState<string | null>(null);
 
     useEffect(() => {
         loadCarData();
@@ -118,6 +120,30 @@ export const CarDetailPage = () => {
                                         ))}
                                     </div>
                                 )}
+
+                                {/* Download All Photos Button */}
+                                <button
+                                    onClick={async () => {
+                                        if (downloadProgress) return;
+                                        setDownloadProgress('Starting...');
+                                        try {
+                                            await downloadAllWithWatermark(
+                                                car.images,
+                                                car.slug || car.title.toLowerCase().replace(/\s+/g, '-'),
+                                                (current, total) => setDownloadProgress(`Downloading ${current}/${total}...`)
+                                            );
+                                        } catch (err) {
+                                            console.error('Download failed:', err);
+                                        } finally {
+                                            setDownloadProgress(null);
+                                        }
+                                    }}
+                                    disabled={!!downloadProgress}
+                                    className="mt-3 flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <FiDownload className="w-4 h-4" />
+                                    {downloadProgress || `Download All Photos (${car.images.length})`}
+                                </button>
                             </motion.div>
 
                             {/* Quick Specs */}
@@ -367,6 +393,7 @@ When would be a good time?`
                     images={car.images}
                     initialIndex={selectedImage}
                     onIndexChange={setSelectedImage}
+                    carTitle={car.title}
                 />
             )}
         </>

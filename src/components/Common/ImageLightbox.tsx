@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiX, FiChevronLeft, FiChevronRight, FiDownload } from 'react-icons/fi';
+import { downloadWithWatermark } from '../../utils/downloadWithWatermark';
 
 interface ImageLightboxProps {
     isOpen: boolean;
@@ -8,6 +9,7 @@ interface ImageLightboxProps {
     images: string[];
     initialIndex: number;
     onIndexChange: (index: number) => void;
+    carTitle?: string;
 }
 
 export const ImageLightbox = ({
@@ -16,8 +18,10 @@ export const ImageLightbox = ({
     images,
     initialIndex,
     onIndexChange,
+    carTitle = 'car',
 }: ImageLightboxProps) => {
     const currentIndex = initialIndex;
+    const [downloading, setDownloading] = useState(false);
 
     // Handle keyboard navigation
     useEffect(() => {
@@ -59,6 +63,22 @@ export const ImageLightbox = ({
         onIndexChange(newIndex);
     };
 
+    const handleDownload = async () => {
+        if (downloading) return;
+        setDownloading(true);
+        try {
+            const slug = carTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            await downloadWithWatermark(
+                images[currentIndex],
+                `kaysdrive-${slug}-${currentIndex + 1}.jpg`
+            );
+        } catch (err) {
+            console.error('Download failed:', err);
+        } finally {
+            setDownloading(false);
+        }
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -70,6 +90,32 @@ export const ImageLightbox = ({
                     className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
                     onClick={onClose}
                 >
+                    {/* Top Toolbar */}
+                    {/* Download Button */}
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.1 }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload();
+                        }}
+                        disabled={downloading}
+                        className="absolute top-4 left-4 z-10 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors backdrop-blur-sm disabled:opacity-50"
+                        aria-label="Download image"
+                        title="Download with watermark"
+                    >
+                        {downloading ? (
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"
+                            />
+                        ) : (
+                            <FiDownload className="w-6 h-6" />
+                        )}
+                    </motion.button>
+
                     {/* Close Button */}
                     <motion.button
                         initial={{ opacity: 0, scale: 0.8 }}
