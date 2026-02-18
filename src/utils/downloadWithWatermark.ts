@@ -1,23 +1,21 @@
 /**
  * Download car images with "Kay's Drive" watermark overlay.
  * Uses HTML Canvas API - all processing is client-side.
+ * "Download All" bundles images into a single ZIP file.
  */
+
+import JSZip from 'jszip';
 
 const WATERMARK_TEXT = "Kay's Drive • kaysdrive.com";
 
 /**
- * Fetch an image, draw a watermark on it via Canvas, and trigger a download.
+ * Apply watermark to an image and return as a Blob.
  */
-export const downloadWithWatermark = async (
-    imageUrl: string,
-    filename: string
-): Promise<void> => {
-    // Fetch image as blob to avoid CORS issues
+const applyWatermark = async (imageUrl: string): Promise<Blob> => {
     const response = await fetch(imageUrl);
     const blob = await response.blob();
     const imageBitmap = await createImageBitmap(blob);
 
-    // Create canvas at full image resolution
     const canvas = document.createElement('canvas');
     canvas.width = imageBitmap.width;
     canvas.height = imageBitmap.height;
@@ -51,48 +49,56 @@ export const downloadWithWatermark = async (
     // Draw watermark text
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.textBaseline = 'middle';
-    ctx.fillText(
-        WATERMARK_TEXT,
-        bgX + padding,
-        bgY + bgHeight / 2
-    );
+    ctx.fillText(WATERMARK_TEXT, bgX + padding, bgY + bgHeight / 2);
 
-    // Export and trigger download
-    const downloadBlob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob(
-            (b) => resolve(b!),
-            'image/jpeg',
-            0.92
-        );
+    // Export as blob
+    const resultBlob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.92);
     });
 
-    const url = URL.createObjectURL(downloadBlob);
+    imageBitmap.close();
+    return resultBlob;
+};
+
+/**
+ * Download a single image with watermark (used by lightbox).
+ */
+export const downloadWithWatermark = async (
+    imageUrl: string,
+    filename: string
+): Promise<void> => {
+    const blob = await applyWatermark(imageUrl);
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
     link.click();
     URL.revokeObjectURL(url);
-
-    // Cleanup
-    imageBitmap.close();
 };
 
 /**
- * Download all images for a car, each with watermark.
- * Returns a progress callback for UI updates.
+ * Download all images as a single ZIP file with watermarks.
+ * This avoids browser blocking multiple automatic downloads.
  */
 export const downloadAllWithWatermark = async (
     images: string[],
     carSlug: string,
     onProgress?: (current: number, total: number) => void
 ): Promise<void> => {
+    const zip = new JSZip();
+
     for (let i = 0; i < images.length; i++) {
         onProgress?.(i + 1, images.length);
-        const filename = `kaysdrive-${carSlug}-${i + 1}.jpg`;
-        await downloadWithWatermark(images[i], filename);
-        // Small delay between downloads to avoid browser throttling
-        if (i < images.length - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-        }
+        const blob = await applyWatermark(images[i]);
+        zip.file(`kaysdrive-${carSlug}-${i + 1}.jpg`, blob);
     }
+
+    // Generate ZIP and trigger download
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `kaysdrive-${carSlug}-photos.zip`;
+    link.click();
+    URL.revokeObjectURL(url);
 };
