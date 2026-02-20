@@ -40,7 +40,7 @@ const applyWatermark = async (imageUrl: string): Promise<Blob> => {
 
     // --- Centered logo watermark ---
     const minDim = Math.min(canvas.width, canvas.height);
-    const logoSize = minDim * 0.45;
+    const logoSize = minDim * 0.7;
 
     const logoAspect = logo.width / logo.height;
     let drawWidth: number, drawHeight: number;
