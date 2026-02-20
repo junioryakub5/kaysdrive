@@ -213,6 +213,7 @@ export default function Cars() {
                             </div>
                             <div className="car-card-footer">
                                 <div className="car-card-toggles">
+                                    <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>{car.status === 'FOREIGN_USED' ? 'FU' : 'GU'}</span>
                                     <label className="toggle-label">
                                         <span>Published</span>
                                         <button className={`toggle ${car.isPublished ? 'active' : ''}`} onClick={() => handleTogglePublish(car.id)} />
@@ -226,10 +227,9 @@ export default function Cars() {
                                         <button className={`toggle ${car.isSold ? 'active' : ''}`} onClick={() => handleToggleSold(car.id)} style={car.isSold ? { background: '#ef4444' } : {}} />
                                     </label>
                                 </div>
-                                <div className="car-card-actions">
-                                    <span className={`badge ${car.status === 'FOREIGN_USED' ? 'badge-success' : 'badge-info'}`}>{car.status === 'FOREIGN_USED' ? 'FU' : 'GU'}</span>
-                                    <button className="action-btn" onClick={() => openModal(car)}>✏️</button>
-                                    <button className="action-btn danger" onClick={() => handleDelete(car)}>🗑️</button>
+                                <div className="car-card-actions-row">
+                                    <button className="btn btn-sm btn-outline" onClick={() => openModal(car)}>Edit</button>
+                                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(car)}>Delete</button>
                                 </div>
                             </div>
                         </div>
