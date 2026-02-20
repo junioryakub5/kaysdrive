@@ -55,7 +55,7 @@ const applyWatermark = async (imageUrl: string): Promise<Blob> => {
     const logoX = (canvas.width - drawWidth) / 2;
     const logoY = (canvas.height - drawHeight) / 2;
 
-    ctx.globalAlpha = 0.25;
+    ctx.globalAlpha = 0.5;
     ctx.drawImage(logo, logoX, logoY, drawWidth, drawHeight);
     ctx.globalAlpha = 1.0;
 
