@@ -256,6 +256,22 @@ adminRouter.patch('/cars/:id/feature', authMiddleware, async (req: Request, res:
     }
 });
 
+adminRouter.patch('/cars/:id/sold', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const car = await prisma.car.findUnique({ where: { id: req.params.id } });
+        if (!car) throw new AppError('Car not found', 404);
+
+        const updated = await prisma.car.update({
+            where: { id: req.params.id },
+            data: { isSold: !car.isSold },
+        });
+
+        res.json({ success: true, isSold: updated.isSold });
+    } catch (error) {
+        next(error);
+    }
+});
+
 // =============================================================================
 // AGENTS CRUD
 // =============================================================================

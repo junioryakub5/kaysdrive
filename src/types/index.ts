@@ -18,6 +18,7 @@ export interface Car {
     images: string[];
     features: string[];
     description: string;
+    isSold?: boolean;
     agentId: string;
     agent?: {
         id: string;

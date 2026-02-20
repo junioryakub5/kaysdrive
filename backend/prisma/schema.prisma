@@ -31,6 +31,7 @@ model Car {
   description  String
   isPublished  Boolean  @default(true)
   isFeatured   Boolean  @default(false)
+  isSold       Boolean  @default(false)
   agentId      String
   agent        Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
@@ -40,6 +41,7 @@ model Car {
   @@index([manufacturer])
   @@index([isPublished])
   @@index([isFeatured])
+  @@index([isSold])
 }
 
 model Agent {

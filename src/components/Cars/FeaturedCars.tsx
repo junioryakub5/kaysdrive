@@ -89,6 +89,7 @@ export const FeaturedCars = () => {
                                 slug={car.slug}
                                 agent={car.agent?.name || 'N/A'}
                                 date={new Date(car.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                isSold={car.isSold}
                             />
                         </motion.div>
                     ))}

@@ -57,6 +57,7 @@ export interface Car {
     features: string[];
     isPublished: boolean;
     isFeatured: boolean;
+    isSold: boolean;
 }
 
 export interface Agent {
@@ -136,6 +137,7 @@ export const adminApi = {
     deleteCar: (id: string) => axiosInstance.delete(`/cars/${id}`, { headers: getAdminAuthHeaders() }).then(res => res.data),
     togglePublish: (id: string) => axiosInstance.patch(`/cars/${id}/publish`, {}, { headers: getAdminAuthHeaders() }).then(res => res.data),
     toggleFeatured: (id: string) => axiosInstance.patch(`/cars/${id}/feature`, {}, { headers: getAdminAuthHeaders() }).then(res => res.data),
+    toggleSold: (id: string) => axiosInstance.patch(`/cars/${id}/sold`, {}, { headers: getAdminAuthHeaders() }).then(res => res.data),
 
     // Agents
     getAgents: () => axiosInstance.get('/agents', { headers: getAdminAuthHeaders() }).then(res => res.data),

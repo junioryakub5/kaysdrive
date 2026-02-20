@@ -19,6 +19,7 @@ interface CarCardProps {
     slug?: string; // Made optional with default fallback
     agent?: string;
     date?: string;
+    isSold?: boolean;
 }
 
 export const CarCard = ({
@@ -37,6 +38,7 @@ export const CarCard = ({
     slug,
     agent = 'N/A',
     date = 'N/A',
+    isSold = false,
 }: CarCardProps) => {
     const carLink = slug ? `/cars/${slug}` : '#';
 
@@ -100,6 +102,15 @@ export const CarCard = ({
                     >
                         <MdBalance className="w-5 h-5 text-gray-700" />
                     </motion.button>
+
+                    {/* SOLD Overlay */}
+                    {isSold && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+                            <span className="bg-red-600 text-white px-6 py-2 rounded-lg text-xl font-extrabold tracking-widest shadow-lg transform -rotate-12">
+                                SOLD
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Content Section */}

@@ -116,6 +116,11 @@ export default function Cars() {
         loadData();
     };
 
+    const handleToggleSold = async (id: string) => {
+        await api.toggleSold(id);
+        loadData();
+    };
+
     if (loading) return <div className="loading"><div className="spinner" /></div>;
 
     return (
@@ -138,6 +143,7 @@ export default function Cars() {
                             <th>Status</th>
                             <th>Published</th>
                             <th>Featured</th>
+                            <th>Sold</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -169,6 +175,9 @@ export default function Cars() {
                                 </td>
                                 <td>
                                     <button className={`toggle ${car.isFeatured ? 'active' : ''}`} onClick={() => handleToggleFeatured(car.id)} />
+                                </td>
+                                <td>
+                                    <button className={`toggle ${car.isSold ? 'active' : ''}`} onClick={() => handleToggleSold(car.id)} style={car.isSold ? { background: '#ef4444' } : {}} />
                                 </td>
                                 <td>
                                     <div className="action-buttons">
@@ -211,6 +220,10 @@ export default function Cars() {
                                     <label className="toggle-label">
                                         <span>Featured</span>
                                         <button className={`toggle ${car.isFeatured ? 'active' : ''}`} onClick={() => handleToggleFeatured(car.id)} />
+                                    </label>
+                                    <label className="toggle-label">
+                                        <span>Sold</span>
+                                        <button className={`toggle ${car.isSold ? 'active' : ''}`} onClick={() => handleToggleSold(car.id)} style={car.isSold ? { background: '#ef4444' } : {}} />
                                     </label>
                                 </div>
                                 <div className="car-card-actions">

@@ -359,6 +359,7 @@ export const CarsListingPage = () => {
                                             slug={car.slug}
                                             agent={car.agent?.name || 'Agent'}
                                             date={new Date(car.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: '2-digit' })}
+                                            isSold={car.isSold}
                                         />
                                     </motion.div>
                                 ))}

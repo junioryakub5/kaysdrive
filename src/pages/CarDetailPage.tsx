@@ -80,6 +80,17 @@ export const CarDetailPage = () => {
                 ]}
             />
 
+            {/* SOLD Banner */}
+            {car.isSold && (
+                <div className="bg-red-600 text-white py-3">
+                    <div className="max-w-7xl mx-auto px-6 flex items-center justify-center gap-3">
+                        <span className="font-extrabold text-lg tracking-wider">SOLD</span>
+                        <span className="text-red-100">—</span>
+                        <span className="text-sm text-red-100">This vehicle has been sold. Contact the agent for similar vehicles.</span>
+                    </div>
+                </div>
+            )}
+
             <section className="py-16 bg-white">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -261,7 +272,17 @@ export const CarDetailPage = () => {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     href={agent ? `https://wa.me/${agent.phone.replace(/[^0-9+]/g, '').replace(/^0/, '233')}?text=${encodeURIComponent(
-                                        `Hi, I'm interested in:
+                                        car.isSold
+                                            ? `Hi, I saw this vehicle was sold:
+
+${car.title}
+Price: ₵${car.price.toLocaleString()}
+Year: ${car.year}
+
+View: ${window.location.href}
+
+Do you have any similar vehicles available?`
+                                            : `Hi, I'm interested in:
 
 ${car.title}
 Price: ₵${car.price.toLocaleString()}
@@ -275,14 +296,22 @@ I'd like to make an offer on this vehicle.`
                                     )}` : '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-colors mb-3 text-center"
+                                    className={`block w-full ${car.isSold ? 'bg-gray-700 hover:bg-gray-800' : 'bg-primary hover:bg-primary-dark'} text-white py-3 rounded-lg font-semibold transition-colors mb-3 text-center`}
                                 >
-                                    Make an Offer
+                                    {car.isSold ? 'Enquire About Similar Vehicles' : 'Make an Offer'}
                                 </motion.a>
 
                                 <a
                                     href={agent ? `https://wa.me/${agent.phone.replace(/[^0-9+]/g, '').replace(/^0/, '233')}?text=${encodeURIComponent(
-                                        `Hi, I'd like to schedule a test drive for:
+                                        car.isSold
+                                            ? `Hi, I'd like to know more about vehicles similar to:
+
+${car.title}
+Year: ${car.year}
+Location: ${car.city}
+
+View: ${window.location.href}`
+                                            : `Hi, I'd like to schedule a test drive for:
 
 ${car.title}
 Price: ₵${car.price.toLocaleString()}
@@ -297,7 +326,7 @@ When would be a good time?`
                                     rel="noopener noreferrer"
                                     className="block w-full border border-primary text-primary py-3 rounded-lg font-semibold hover:bg-primary/5 transition-colors text-center"
                                 >
-                                    Schedule Test Drive
+                                    {car.isSold ? 'Contact Agent' : 'Schedule Test Drive'}
                                 </a>
                             </motion.div>
 
@@ -377,6 +406,7 @@ When would be a good time?`
                                         slug={similarCar.slug}
                                         agent={similarCar.agent?.name || 'Agent'}
                                         date={new Date(similarCar.createdAt).toLocaleDateString()}
+                                        isSold={similarCar.isSold}
                                     />
                                 </div>
                             ))}
