@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 interface ImageUploadProps {
     images: string[];
@@ -8,15 +8,12 @@ interface ImageUploadProps {
 
 export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadProps) => {
     const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+    const [dragging, setDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
+    const uploadFiles = async (files: File[]) => {
         const remainingSlots = maxImages - images.length;
-        const filesToUpload = Array.from(files).slice(0, remainingSlots);
+        const filesToUpload = files.slice(0, remainingSlots);
 
         if (filesToUpload.length === 0) {
             alert(`Maximum ${maxImages} images allowed`);
@@ -27,9 +24,7 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
 
         try {
             const formData = new FormData();
-            filesToUpload.forEach(file => {
-                formData.append('images', file);
-            });
+            filesToUpload.forEach(file => formData.append('images', file));
 
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/upload/multiple`, {
                 method: 'POST',
@@ -39,13 +34,8 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
             if (!response.ok) throw new Error('Upload failed');
 
             const data = await response.json();
-            // Cloudinary returns absolute URLs, don't prepend backend URL
             const newImageUrls = data.urls.map((url: string) => {
-                // If URL is already absolute (starts with http:// or https://), use it as is
-                if (url.startsWith('http://') || url.startsWith('https://')) {
-                    return url;
-                }
-                // Otherwise, prepend the backend URL for relative paths like /uploads/...
+                if (url.startsWith('http://') || url.startsWith('https://')) return url;
                 return `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'}${url}`;
             });
             onChange([...images, ...newImageUrls]);
@@ -54,76 +44,130 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
             alert('Failed to upload images. Please try again.');
         } finally {
             setUploading(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
-    const removeImage = (index: number) => {
-        const newImages = images.filter((_, i) => i !== index);
-        onChange(newImages);
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+        await uploadFiles(Array.from(files));
     };
+
+    const handleDrop = useCallback(async (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setDragging(false);
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        if (files.length > 0) await uploadFiles(files);
+    }, [images, maxImages]);
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setDragging(true);
+    };
+
+    const handleDragLeave = () => setDragging(false);
+
+    const removeImage = (index: number) => {
+        onChange(images.filter((_, i) => i !== index));
+    };
+
+    const canAddMore = images.length < maxImages;
 
     return (
         <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-                {images.map((url, index) => (
-                    <div key={index} style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', aspectRatio: '1', border: '2px solid var(--border)' }}>
-                        <img
-                            src={url}
-                            alt={`Upload ${index + 1}`}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                        <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            style={{
-                                position: 'absolute',
-                                top: '4px',
-                                right: '4px',
-                                background: '#ef4444',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '24px',
-                                height: '24px',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            ✕
-                        </button>
-                    </div>
-                ))}
-
-                {images.length < maxImages && (
-                    <div
-                        onClick={() => fileInputRef.current?.click()}
-                        style={{
-                            border: '2px dashed var(--border)',
+            {/* Existing images grid */}
+            {images.length > 0 && (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
+                    gap: '0.75rem',
+                    marginBottom: '1rem'
+                }}>
+                    {images.map((url, index) => (
+                        <div key={index} style={{
+                            position: 'relative',
                             borderRadius: '0.5rem',
+                            overflow: 'hidden',
                             aspectRatio: '1',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: uploading ? 'not-allowed' : 'pointer',
-                            background: 'var(--bg-secondary)',
-                            opacity: uploading ? 0.5 : 1,
-                        }}
-                    >
-                        <div style={{ fontSize: '2rem' }}>+</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            {uploading ? 'Uploading...' : 'Add Image'}
+                            border: '2px solid var(--border)',
+                        }}>
+                            <img
+                                src={url}
+                                alt={`Upload ${index + 1}`}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                style={{
+                                    position: 'absolute', top: '4px', right: '4px',
+                                    background: '#ef4444', color: 'white', border: 'none',
+                                    borderRadius: '50%', width: '22px', height: '22px',
+                                    cursor: 'pointer', fontSize: '13px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                                }}
+                            >
+                                ✕
+                            </button>
                         </div>
-                    </div>
-                )}
-            </div>
+                    ))}
+                </div>
+            )}
 
+            {/* Drop zone — always visible when can add more */}
+            {canAddMore && (
+                <div
+                    onClick={() => !uploading && fileInputRef.current?.click()}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    style={{
+                        border: `2px dashed ${dragging ? '#6366f1' : 'var(--border)'}`,
+                        borderRadius: '0.75rem',
+                        padding: '2rem 1rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        cursor: uploading ? 'not-allowed' : 'pointer',
+                        background: dragging ? 'rgba(99,102,241,0.05)' : 'var(--bg-secondary)',
+                        opacity: uploading ? 0.6 : 1,
+                        transition: 'all 0.2s ease',
+                        textAlign: 'center',
+                    }}
+                >
+                    <div style={{ fontSize: '2.5rem', lineHeight: 1 }}>
+                        {uploading ? '⏳' : '📷'}
+                    </div>
+                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+                        {uploading ? 'Uploading...' : 'Click or drag & drop photos here'}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        {uploading
+                            ? 'Please wait'
+                            : `Select multiple photos at once • Max ${maxImages} images • 5MB each`
+                        }
+                    </div>
+                    {!uploading && (
+                        <div style={{
+                            marginTop: '0.5rem',
+                            background: 'var(--primary, #6366f1)',
+                            color: 'white',
+                            padding: '0.4rem 1.2rem',
+                            borderRadius: '0.5rem',
+                            fontSize: '0.85rem',
+                            fontWeight: 600,
+                        }}>
+                            Browse Files
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Hidden input — multiple is key */}
             <input
                 ref={fileInputRef}
                 type="file"
@@ -134,7 +178,8 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
             />
 
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                {images.length} / {maxImages} images • Maximum 5MB per image
+                {images.length} / {maxImages} photos added
+                {images.length === 0 && ' • Hold Ctrl (or Cmd on Mac) to select multiple files'}
             </p>
         </div>
     );
