@@ -10,6 +10,7 @@ import { ImageLightbox } from '../components/Common/ImageLightbox';
 import { carsApi, agentsApi } from '../services/api';
 import type { Car, Agent } from '../types';
 import { CarSchema } from '../components/SEO/CarSchema';
+import { SEO } from '../components/SEO/SEO';
 
 export const CarDetailPage = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -72,6 +73,12 @@ export const CarDetailPage = () => {
     return (
         <>
             <CarSchema car={car} />
+            <SEO
+                title={`${car.title} for Sale in ${car.city} | Kay's Drive`}
+                description={`${car.year} ${car.manufacturer || car.title} — ${car.engine}, ${car.fuel}, ${car.transmission}, ${car.mileage?.toLocaleString()} km. Priced at GH₵${car.price?.toLocaleString()}. Available in ${car.city}, Ghana at Kay's Drive.`}
+                canonical={`/cars/${car.slug}`}
+                image={car.images?.[0] || undefined}
+            />
             <PageHero
                 title={car.title}
                 breadcrumbs={[

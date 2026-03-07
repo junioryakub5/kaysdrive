@@ -4,6 +4,7 @@ import { PageHero } from '../components/Common/PageHero';
 import { servicesApi } from '../services/api';
 import type { Service } from '../types';
 import { FiSettings, FiShield, FiDollarSign, FiStar, FiTool, FiDisc } from 'react-icons/fi';
+import { SEO } from '../components/SEO/SEO';
 
 const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
     engine: FiSettings,
@@ -31,6 +32,12 @@ export const ServicesPage = () => {
 
     return (
         <>
+            <SEO
+                title="Our Services | Kay's Drive Car Dealership Kumasi"
+                description="Kay's Drive offers comprehensive automotive services in Kumasi, Ghana — car sales, vehicle inspection, financing assistance, and more. Quality service you can trust."
+                keywords="car services Kumasi, automotive services Ghana, car inspection Ghana, vehicle financing, Kay's Drive services"
+                canonical="https://kaysdrive.com/services"
+            />
             <PageHero
                 title="Our Services"
                 breadcrumbs={[{ label: 'Our Services' }]}

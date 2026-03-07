@@ -4,6 +4,7 @@ import { PageHero } from '../components/Common/PageHero';
 import { faqApi } from '../services/api';
 import type { FAQ } from '../types';
 import { FiChevronDown } from 'react-icons/fi';
+import { SEO } from '../components/SEO/SEO';
 
 export const FAQPage = () => {
     const [faqs, setFaqs] = useState<FAQ[]>([]);
@@ -33,6 +34,12 @@ export const FAQPage = () => {
 
     return (
         <>
+            <SEO
+                title="Frequently Asked Questions | Kay's Drive"
+                description="Get answers to common questions about buying cars at Kay's Drive in Kumasi, Ghana. Financing, vehicle condition, purchasing process, and more explained clearly."
+                keywords="car buying FAQ Ghana, used car questions Kumasi, automotive FAQ, how to buy car Ghana, Kay's Drive FAQ"
+                canonical="https://kaysdrive.com/faq"
+            />
             <PageHero
                 title="Frequently Asked Questions"
                 breadcrumbs={[{ label: 'FAQ' }]}
