@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from '../components/Layout/Header';
 import { Footer } from '../components/Layout/Footer';
 import { AnalyticsTracker } from '../components/Analytics/AnalyticsTracker';
+import { CookieConsent } from '../components/CookieConsent/CookieConsent';
 
 export const MainLayout = () => {
     const { pathname } = useLocation();
@@ -15,6 +16,7 @@ export const MainLayout = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <AnalyticsTracker />
+            <CookieConsent />
             <Header />
             <main className="flex-1">
                 <Suspense fallback={
