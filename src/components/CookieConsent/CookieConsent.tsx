@@ -98,15 +98,16 @@ export const CookieConsent = () => {
                         transition={{ duration: 0.25, ease: 'easeOut' }}
                         style={{
                             position: 'fixed',
-                            bottom: '1rem',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
                             zIndex: 9999,
-                            width: 'calc(100% - 1.5rem)',
-                            maxWidth: '700px',
+                            padding: '0 0.75rem 0.75rem',
+                            display: 'flex',
+                            justifyContent: 'center',
                         }}
                     >
-                        <div className="kd-cookie-banner">
+                        <div className="kd-cookie-banner" style={{ width: '100%', maxWidth: '700px' }}>
                             <div style={{ width: 4, minHeight: 36, background: '#DC2626', borderRadius: 4, flexShrink: 0, alignSelf: 'stretch' }} />
                             <p className="kd-cookie-text">
                                 We use cookies to enhance your experience on Kay's Drive.{' '}
