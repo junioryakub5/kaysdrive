@@ -148,7 +148,7 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                         {uploading
                             ? 'Please wait'
-                            : `Select multiple photos at once • Max ${maxImages} images • 5MB each`
+                            : `Select multiple photos at once • Max ${maxImages} images • 100MB each`
                         }
                     </div>
                     {!uploading && (
