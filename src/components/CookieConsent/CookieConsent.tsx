@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 const STORAGE_KEY = 'kd-cookie-consent';
 
 export const CookieConsent = () => {
-    // Read synchronously to avoid flicker — don't show if already set
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -35,68 +34,85 @@ export const CookieConsent = () => {
                     transition={{ duration: 0.25, ease: 'easeOut' }}
                     style={{
                         position: 'fixed',
-                        bottom: '1rem',
+                        bottom: '1.25rem',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         zIndex: 9999,
                         width: 'calc(100% - 2rem)',
-                        maxWidth: '680px',
+                        maxWidth: '700px',
+                        fontFamily: "'Manrope', sans-serif",
                     }}
                 >
                     <div style={{
-                        background: 'rgba(15, 15, 20, 0.96)',
-                        backdropFilter: 'blur(12px)',
+                        background: '#FFFFFF',
+                        border: '1px solid #E5E7EB',
                         borderRadius: '12px',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        padding: '0.875rem 1.25rem',
+                        padding: '1rem 1.25rem',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '1rem',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
                         flexWrap: 'wrap',
                     }}>
-                        <span style={{ fontSize: '1.2rem' }}>🍪</span>
+                        {/* Red left accent bar */}
+                        <div style={{
+                            width: '4px',
+                            height: '36px',
+                            background: '#DC2626',
+                            borderRadius: '4px',
+                            flexShrink: 0,
+                        }} />
+
                         <p style={{
                             flex: 1,
-                            color: 'rgba(255,255,255,0.8)',
+                            color: '#374151',
                             fontSize: '0.85rem',
                             margin: 0,
-                            lineHeight: 1.4,
+                            lineHeight: 1.5,
                             minWidth: '200px',
                         }}>
-                            We use cookies to improve your experience.{' '}
-                            <a href="/privacy" style={{ color: '#818cf8', textDecoration: 'underline' }}>
+                            We use cookies to enhance your experience on Kay's Drive.{' '}
+                            <a href="/privacy" style={{ color: '#DC2626', textDecoration: 'underline', fontWeight: 600 }}>
                                 Privacy Policy
                             </a>
                         </p>
+
                         <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                             <button
                                 onClick={reject}
                                 style={{
-                                    background: 'rgba(255,255,255,0.1)',
-                                    color: 'rgba(255,255,255,0.7)',
-                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    background: 'transparent',
+                                    color: '#6B7280',
+                                    border: '1px solid #D1D5DB',
                                     borderRadius: '8px',
-                                    padding: '0.4rem 0.9rem',
-                                    fontSize: '0.8rem',
+                                    padding: '0.45rem 1rem',
+                                    fontSize: '0.82rem',
                                     cursor: 'pointer',
-                                    fontWeight: 500,
+                                    fontWeight: 600,
+                                    fontFamily: "'Manrope', sans-serif",
+                                    transition: 'all 0.15s',
                                 }}
+                                onMouseEnter={e => { (e.target as HTMLButtonElement).style.borderColor = '#9CA3AF'; }}
+                                onMouseLeave={e => { (e.target as HTMLButtonElement).style.borderColor = '#D1D5DB'; }}
                             >
                                 Decline
                             </button>
                             <button
                                 onClick={accept}
                                 style={{
-                                    background: '#6366f1',
-                                    color: 'white',
+                                    background: '#DC2626',
+                                    color: '#FFFFFF',
                                     border: 'none',
                                     borderRadius: '8px',
-                                    padding: '0.4rem 1rem',
-                                    fontSize: '0.8rem',
+                                    padding: '0.45rem 1.1rem',
+                                    fontSize: '0.82rem',
                                     cursor: 'pointer',
-                                    fontWeight: 600,
+                                    fontWeight: 700,
+                                    fontFamily: "'Manrope', sans-serif",
+                                    transition: 'background 0.15s',
                                 }}
+                                onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = '#B91C1C'; }}
+                                onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = '#DC2626'; }}
                             >
                                 Accept All
                             </button>
