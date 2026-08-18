@@ -47,7 +47,7 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', padding: '2rem' }}>
+            <div className="dash-stats-grid" style={{ padding: '2rem' }}>
                 {[1, 2, 3, 4].map(i => (
                     <div key={i} style={{ height: '120px', backgroundColor: '#f1f5f9', borderRadius: '1rem', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
                 ))}
@@ -56,29 +56,20 @@ export default function Dashboard() {
     }
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '64px' }}>
+        <div className="dash-page-wrap">
             {/* Welcome Bar */}
-            <div style={{ 
-                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', 
-                borderRadius: '1rem', 
-                padding: '2rem', 
-                color: 'white',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-            }}>
+            <div className="dash-welcome-bar">
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>{getGreeting()}, Admin</h1>
-                    <p style={{ color: '#94a3b8', margin: '0.5rem 0 0 0' }}>Welcome to the Kay's Drive Admin Panel.</p>
+                    <h1 className="dash-welcome-title">{getGreeting()}, Admin</h1>
+                    <p className="dash-welcome-sub">Welcome to the Kay's Drive Admin Panel.</p>
                 </div>
-                <div style={{ color: '#cbd5e1', fontSize: '0.875rem', fontWeight: 500 }}>
+                <div className="dash-welcome-date">
                     {new Date().toLocaleDateString('en-GH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </div>
             </div>
 
             {/* Stats Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+            <div className="dash-stats-grid">
                 <Link to="/admin/cars" style={{ textDecoration: 'none' }}>
                     <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'}>
                         <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -127,7 +118,7 @@ export default function Dashboard() {
 
             {/* E-Commerce Row */}
             {(stats as any)?.totalOrders !== undefined && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+                <div className="dash-ecom-grid">
                     <Link to="/admin/orders" style={{ textDecoration: 'none' }}>
                         <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
                             <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -165,7 +156,7 @@ export default function Dashboard() {
             )}
 
             {/* Two Column Section */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
+            <div className="dash-two-col">
                 {/* LEFT - Recent Orders */}
                 <div style={{ background: 'white', borderRadius: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -252,7 +243,7 @@ export default function Dashboard() {
             {/* Quick Actions */}
             <div>
                 <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#0f172a', marginBottom: '1rem', marginTop: '1rem' }}>Quick Actions</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                <div className="dash-actions-grid">
                     {[
                         { to: '/admin/cars', icon: FiTruck, label: 'Manage Cars' },
                         { to: '/admin/agents', icon: FiUsers, label: 'Manage Agents' },

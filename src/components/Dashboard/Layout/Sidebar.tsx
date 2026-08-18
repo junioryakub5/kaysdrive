@@ -84,14 +84,15 @@ export function Sidebar({ type }: SidebarProps) {
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
-        width: collapsed ? '80px' : '260px',
-        transition: 'width 0.3s ease',
         position: 'fixed',
         left: 0,
         top: 0,
         zIndex: 50,
-        borderRight: '1px solid #1e293b'
+        borderRight: '1px solid #1e293b',
+        // Width is controlled by CSS classes (sidebar, sidebar.collapsed) + media queries
+        // Do NOT set width here — let Sidebar.css handle it at each breakpoint
     };
+
 
     const getNavItemStyle = (isActive: boolean): React.CSSProperties => ({
         display: 'flex',
