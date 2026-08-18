@@ -10,6 +10,7 @@ import { agentRouter } from './routes/agent.js';
 import { uploadRouter } from './routes/upload.js';
 import analyticsRouter from './routes/analytics.js';
 import { storeRouter } from './routes/store.js';
+import { webhookRouter } from './routes/webhook.js';
 
 const app = express();
 
@@ -27,6 +28,21 @@ app.use(cors({
     origin: allowedOrigins,
     credentials: true,
 }));
+
+// ── Paystack webhook — must be BEFORE express.json() ──────────────────────────
+// Paystack requires the raw (unparsed) request body to verify the HMAC-SHA512
+// signature. We capture it on req.rawBody and mount the webhook here before
+// express.json() parses the body.
+app.use(
+    '/api/webhook',
+    express.raw({ type: 'application/json' }),
+    (req: any, _res: any, next: any) => {
+        req.rawBody = req.body;
+        next();
+    },
+    webhookRouter
+);
+
 app.use(express.json());
 
 // Serve uploaded files statically
