@@ -516,28 +516,37 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    gap: 0.25rem;
+    padding: 0.3125rem 0.625rem;
     border-radius: var(--radius-md);
-    border: none;
-    background: transparent;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
     cursor: pointer;
     transition: all var(--transition-fast);
-    font-size: 1rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    line-height: 1;
 }
 
 .action-btn:hover {
     background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-focus);
 }
 
 .action-btn.danger {
     color: #ef4444;
+    border-color: #fecaca;
 }
 
 .action-btn.danger:hover {
     background: var(--danger-bg);
     color: var(--danger);
+    border-color: var(--danger);
 }
+
 
 /* ============ Search Bar ============ */
 .search-container {
