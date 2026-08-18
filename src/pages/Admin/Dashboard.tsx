@@ -1,12 +1,20 @@
-/**
- * Admin Dashboard Page - Redesigned with new components
- * Preserves all existing functionality
- */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiTruck, FiUsers, FiMail, FiInbox, FiBarChart2, FiShoppingBag, FiPackage, FiDollarSign } from 'react-icons/fi';
+import { FiTruck, FiUsers, FiMail, FiInbox, FiBarChart2, FiShoppingBag, FiPackage, FiDollarSign, FiArrowRight } from 'react-icons/fi';
 import { adminApi as api, type Stats, type AnalyticsStats } from '../../services/adminApi';
-import { PageHeader, StatCard } from '../../components/Dashboard/UI';
+
+const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+};
+
+const formatPrice = (p: number) =>
+    new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS', minimumFractionDigits: 0 }).format(p);
+
+const formatDate = (d: string) =>
+    new Date(d).toLocaleDateString('en-GH', { day: 'numeric', month: 'short' });
 
 export default function Dashboard() {
     const [stats, setStats] = useState<Stats | null>(null);
@@ -26,294 +34,239 @@ export default function Dashboard() {
             .finally(() => setLoading(false));
     }, []);
 
+    const payBadge: Record<string, { bg: string, color: string }> = {
+        PENDING: { bg: '#fef3c7', color: '#92400e' }, PAID: { bg: '#dcfce7', color: '#166534' },
+        FAILED: { bg: '#fee2e2', color: '#991b1b' }, REFUNDED: { bg: '#f1f5f9', color: '#475569' }
+    };
+    const orderBadge: Record<string, { bg: string, color: string }> = {
+        PENDING: { bg: '#fef3c7', color: '#92400e' }, CONFIRMED: { bg: '#dbeafe', color: '#1e40af' },
+        PROCESSING: { bg: '#dbeafe', color: '#1e40af' }, READY: { bg: '#dcfce7', color: '#166534' },
+        DISPATCHED: { bg: '#dcfce7', color: '#166534' }, DELIVERED: { bg: '#dcfce7', color: '#166534' },
+        CANCELLED: { bg: '#fee2e2', color: '#991b1b' }
+    };
+
     if (loading) {
         return (
-            <div className="loading-container">
-                <div className="spinner" />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', padding: '2rem' }}>
+                {[1, 2, 3, 4].map(i => (
+                    <div key={i} style={{ height: '120px', backgroundColor: '#f1f5f9', borderRadius: '1rem', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
+                ))}
             </div>
         );
     }
 
     return (
-        <div>
-            <PageHeader
-                title="Dashboard"
-                subtitle="Welcome to the Carz Admin Dashboard"
-            />
-
-            {/* Stats Grid - Core */}
-            <div className="stats-grid">
-                <StatCard
-                    icon={<FiTruck className="w-6 h-6" />}
-                    label="Total Cars"
-                    value={stats?.totalCars || 0}
-                    color="primary"
-                    link="/admin/cars"
-                />
-                <StatCard
-                    icon={<FiUsers className="w-6 h-6" />}
-                    label="Active Agents"
-                    value={stats?.totalAgents || 0}
-                    color="success"
-                    link="/admin/agents"
-                />
-                <StatCard
-                    icon={<FiMail className="w-6 h-6" />}
-                    label="Total Contacts"
-                    value={stats?.totalContacts || 0}
-                    color="primary"
-                    link="/admin/contacts"
-                />
-                <StatCard
-                    icon={<FiInbox className="w-6 h-6" />}
-                    label="Unread Messages"
-                    value={stats?.unreadContacts || 0}
-                    color={stats?.unreadContacts ? 'warning' : 'primary'}
-                    link="/admin/contacts"
-                />
+        <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '64px' }}>
+            {/* Welcome Bar */}
+            <div style={{ 
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', 
+                borderRadius: '1rem', 
+                padding: '2rem', 
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+            }}>
+                <div>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>{getGreeting()}, Admin</h1>
+                    <p style={{ color: '#94a3b8', margin: '0.5rem 0 0 0' }}>Welcome to the Kay's Drive Admin Panel.</p>
+                </div>
+                <div style={{ color: '#cbd5e1', fontSize: '0.875rem', fontWeight: 500 }}>
+                    {new Date().toLocaleDateString('en-GH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>
             </div>
 
-            {/* E-Commerce Stats */}
+            {/* Stats Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+                <Link to="/admin/cars" style={{ textDecoration: 'none' }}>
+                    <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <FiTruck size={24} />
+                        </div>
+                        <div>
+                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>Total Cars</div>
+                            <div style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>{stats?.totalCars || 0}</div>
+                        </div>
+                    </div>
+                </Link>
+                <Link to="/admin/agents" style={{ textDecoration: 'none' }}>
+                    <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <FiUsers size={24} />
+                        </div>
+                        <div>
+                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>Active Agents</div>
+                            <div style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>{stats?.totalAgents || 0}</div>
+                        </div>
+                    </div>
+                </Link>
+                <Link to="/admin/contacts" style={{ textDecoration: 'none' }}>
+                    <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <FiMail size={24} />
+                        </div>
+                        <div>
+                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>Total Contacts</div>
+                            <div style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>{stats?.totalContacts || 0}</div>
+                        </div>
+                    </div>
+                </Link>
+                <Link to="/admin/contacts" style={{ textDecoration: 'none' }}>
+                    <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', transition: 'box-shadow 0.2s', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: (stats?.unreadContacts || 0) > 0 ? '#fef3c7' : '#f1f5f9', color: (stats?.unreadContacts || 0) > 0 ? '#d97706' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <FiInbox size={24} />
+                        </div>
+                        <div>
+                            <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>Unread Messages</div>
+                            <div style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>{stats?.unreadContacts || 0}</div>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+
+            {/* E-Commerce Row */}
             {(stats as any)?.totalOrders !== undefined && (
-                <div className="stats-grid" style={{ marginTop: '1.5rem' }}>
-                    <StatCard
-                        icon={<FiPackage className="w-6 h-6" />}
-                        label="Total Orders"
-                        value={(stats as any).totalOrders || 0}
-                        color="primary"
-                        link="/admin/orders"
-                    />
-                    <StatCard
-                        icon={<FiShoppingBag className="w-6 h-6" />}
-                        label="Pending Orders"
-                        value={(stats as any).pendingOrders || 0}
-                        color={(stats as any).pendingOrders > 0 ? 'warning' : 'primary'}
-                        link="/admin/orders"
-                    />
-                    <StatCard
-                        icon={<FiDollarSign className="w-6 h-6" />}
-                        label="Total Revenue"
-                        value={`GHS ${((stats as any).totalRevenue || 0).toFixed(2)}`}
-                        color="success"
-                        link="/admin/orders"
-                    />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+                    <Link to="/admin/orders" style={{ textDecoration: 'none' }}>
+                        <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <FiPackage size={24} />
+                            </div>
+                            <div>
+                                <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>Orders</div>
+                                <div style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>{(stats as any).totalOrders || 0}</div>
+                            </div>
+                        </div>
+                    </Link>
+                    <Link to="/admin/orders" style={{ textDecoration: 'none' }}>
+                        <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: ((stats as any).pendingOrders || 0) > 0 ? '#fef3c7' : '#f1f5f9', color: ((stats as any).pendingOrders || 0) > 0 ? '#d97706' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <FiShoppingBag size={24} />
+                            </div>
+                            <div>
+                                <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>Pending Orders</div>
+                                <div style={{ color: '#0f172a', fontSize: '1.5rem', fontWeight: 700 }}>{(stats as any).pendingOrders || 0}</div>
+                            </div>
+                        </div>
+                    </Link>
+                    <Link to="/admin/orders" style={{ textDecoration: 'none' }}>
+                        <div style={{ background: 'white', borderRadius: '1rem', padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <FiDollarSign size={24} />
+                            </div>
+                            <div>
+                                <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 500 }}>Revenue</div>
+                                <div style={{ color: '#0f172a', fontSize: '1.25rem', fontWeight: 700 }}>{formatPrice((stats as any).totalRevenue || 0)}</div>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
             )}
 
-            {/* Visitor Analytics Section */}
-            <div className="dashboard-card" style={{ marginTop: '2rem' }}>
-                <h3 className="section-title"><FiBarChart2 className="inline mr-2" /> Visitor Analytics</h3>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: '1rem',
-                    marginBottom: '1.5rem'
-                }}>
-                    <div style={{
-                        padding: '1rem',
-                        background: 'var(--bg-hover)',
-                        borderRadius: 'var(--radius-md)',
-                    }}>
-                        <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>
-                            Total Visitors
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>
-                                {analytics?.totalVisitors || 0}
-                            </span>
-                            <span className="text-muted text-sm">unique</span>
-                        </div>
+            {/* Two Column Section */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
+                {/* LEFT - Recent Orders */}
+                <div style={{ background: 'white', borderRadius: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 600, color: '#0f172a' }}>Recent Orders</h2>
+                        <Link to="/admin/orders" style={{ color: '#2563eb', fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>View all <FiArrowRight /></Link>
                     </div>
-
-                    <div style={{
-                        padding: '1rem',
-                        background: 'var(--bg-hover)',
-                        borderRadius: 'var(--radius-md)',
-                    }}>
-                        <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>
-                            Page Views
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>
-                                {analytics?.totalPageViews || 0}
-                            </span>
-                            <span className="text-muted text-sm">total</span>
-                        </div>
-                    </div>
-
-                    <div style={{
-                        padding: '1rem',
-                        background: 'var(--bg-hover)',
-                        borderRadius: 'var(--radius-md)',
-                    }}>
-                        <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>
-                            Today's Visitors
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--success)' }}>
-                                {analytics?.todayVisitors || 0}
-                            </span>
-                            <span className="text-muted text-sm">today</span>
-                        </div>
-                    </div>
-
-                    <div style={{
-                        padding: '1rem',
-                        background: 'var(--bg-hover)',
-                        borderRadius: 'var(--radius-md)',
-                    }}>
-                        <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>
-                            This Week
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--success)' }}>
-                                {analytics?.weekVisitors || 0}
-                            </span>
-                            <span className="text-muted text-sm">visitors</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Popular Pages */}
-                {analytics?.popularPages && analytics.popularPages.length > 0 && (
-                    <div>
-                        <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--text-muted)' }}>
-                            Popular Pages
-                        </h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            {analytics.popularPages.slice(0, 5).map((page, index) => (
-                                <div key={index} style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '0.5rem',
-                                    background: 'var(--bg-secondary)',
-                                    borderRadius: 'var(--radius-sm)',
-                                }}>
-                                    <span style={{ fontSize: '0.875rem', fontFamily: 'monospace' }}>
-                                        {page.page}
-                                    </span>
-                                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--primary)' }}>
-                                        {page.views} views
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Quick Actions Card */}
-            <div className="dashboard-card" style={{ marginTop: '1.5rem' }}>
-                <h3 className="section-title">Quick Actions</h3>
-                <div className="quick-actions">
-                    <Link to="/admin/cars" className="btn btn-primary">
-                        <FiTruck className="inline mr-2" /> Manage Cars
-                    </Link>
-                    <Link to="/admin/agents" className="btn btn-secondary">
-                        <FiUsers className="inline mr-2" /> Manage Agents
-                    </Link>
-                    <Link to="/admin/contacts" className="btn btn-secondary">
-                        <FiMail className="inline mr-2" /> View Contacts
-                    </Link>
-                    <Link to="/admin/store" className="btn btn-secondary">
-                        <FiShoppingBag className="inline mr-2" /> Products
-                    </Link>
-                    <Link to="/admin/orders" className="btn btn-secondary">
-                        <FiPackage className="inline mr-2" /> Orders
-                    </Link>
-                </div>
-            </div>
-
-            {/* Recent Orders */}
-            {(stats as any)?.recentOrders?.length > 0 && (
-                <div className="dashboard-card" style={{ marginTop: '1.5rem' }}>
-                    <h3 className="section-title">Recent Orders</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {(stats as any).recentOrders.map((order: any) => (
-                            <div key={order.id} style={{
-                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                padding: '0.75rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
-                                flexWrap: 'wrap', gap: '0.5rem',
-                            }}>
-                                <div>
-                                    <div style={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '0.85rem', color: 'var(--primary)' }}>{order.orderNumber}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.customerName}</div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontWeight: 600 }}>GHS {parseFloat(order.total).toFixed(2)}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                        {order.paymentStatus} · {order.orderStatus}
+                    <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {(stats as any)?.recentOrders?.length > 0 ? (
+                            (stats as any).recentOrders.map((order: any) => (
+                                <div key={order.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '0.75rem', border: '1px solid #f1f5f9' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                        <div style={{ fontFamily: 'monospace', color: '#2563eb', fontWeight: 600, fontSize: '0.875rem' }}>{order.orderNumber}</div>
+                                        <div style={{ color: '#0f172a', fontWeight: 500, fontSize: '0.875rem' }}>{order.customerName}</div>
+                                        <div style={{ color: '#64748b', fontSize: '0.75rem' }}>{formatDate(order.createdAt)}</div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{formatPrice(parseFloat(order.total))}</div>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <span style={{ padding: '0.125rem 0.5rem', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 600, backgroundColor: payBadge[order.paymentStatus]?.bg || '#f1f5f9', color: payBadge[order.paymentStatus]?.color || '#475569' }}>
+                                                {order.paymentStatus}
+                                            </span>
+                                            <span style={{ padding: '0.125rem 0.5rem', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 600, backgroundColor: orderBadge[order.orderStatus]?.bg || '#f1f5f9', color: orderBadge[order.orderStatus]?.color || '#475569' }}>
+                                                {order.orderStatus}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div style={{ textAlign: 'right', marginTop: '0.75rem' }}>
-                        <Link to="/admin/orders" style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: 600 }}>View all orders →</Link>
+                            ))
+                        ) : (
+                            <div style={{ color: '#64748b', textAlign: 'center', padding: '2rem' }}>No recent orders found.</div>
+                        )}
                     </div>
                 </div>
-            )}
 
-            {/* Platform Overview */}
-            <div className="dashboard-card" style={{ marginTop: '1.5rem' }}>
-                <h3 className="section-title">Platform Overview</h3>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: '1rem'
-                }}>
-                    <div style={{
-                        padding: '1rem',
-                        background: 'var(--bg-hover)',
-                        borderRadius: 'var(--radius-md)',
-                    }}>
-                        <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>
-                            Car Listings
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>
-                                {stats?.totalCars || 0}
-                            </span>
-                            <span className="text-muted text-sm">vehicles</span>
-                        </div>
+                {/* RIGHT - Analytics */}
+                <div style={{ background: 'white', borderRadius: '1rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h2 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <FiBarChart2 /> Analytics
+                        </h2>
                     </div>
+                    <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                            <div>
+                                <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Today</div>
+                                <div style={{ color: '#0f172a', fontSize: '1.25rem', fontWeight: 700 }}>{analytics?.todayVisitors || 0}</div>
+                                <div style={{ width: '100%', height: '4px', background: '#f1f5f9', borderRadius: '2px', marginTop: '0.5rem', overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', background: '#3b82f6', width: `${Math.min(100, ((analytics?.todayVisitors || 0) / (analytics?.totalVisitors || 1)) * 100)}%` }} />
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500, textTransform: 'uppercase', marginBottom: '0.25rem' }}>This Week</div>
+                                <div style={{ color: '#0f172a', fontSize: '1.25rem', fontWeight: 700 }}>{analytics?.weekVisitors || 0}</div>
+                                <div style={{ width: '100%', height: '4px', background: '#f1f5f9', borderRadius: '2px', marginTop: '0.5rem', overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', background: '#10b981', width: `${Math.min(100, ((analytics?.weekVisitors || 0) / (analytics?.totalVisitors || 1)) * 100)}%` }} />
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Total</div>
+                                <div style={{ color: '#0f172a', fontSize: '1.25rem', fontWeight: 700 }}>{analytics?.totalVisitors || 0}</div>
+                                <div style={{ width: '100%', height: '4px', background: '#f1f5f9', borderRadius: '2px', marginTop: '0.5rem', overflow: 'hidden' }}>
+                                    <div style={{ height: '100%', background: '#8b5cf6', width: '100%' }} />
+                                </div>
+                            </div>
+                        </div>
 
-                    <div style={{
-                        padding: '1rem',
-                        background: 'var(--bg-hover)',
-                        borderRadius: 'var(--radius-md)',
-                    }}>
-                        <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>
-                            Active Team
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 700 }}>
-                                {stats?.totalAgents || 0}
-                            </span>
-                            <span className="text-muted text-sm">agents</span>
-                        </div>
+                        {analytics?.popularPages && analytics.popularPages.length > 0 && (
+                            <div>
+                                <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a', marginBottom: '1rem' }}>Popular Pages</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    {analytics.popularPages.slice(0, 5).map((page, i) => (
+                                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ fontFamily: 'monospace', fontSize: '0.875rem', color: '#475569' }}>{page.page}</div>
+                                            <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a', background: '#f1f5f9', padding: '0.125rem 0.5rem', borderRadius: '9999px' }}>{page.views}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
+                </div>
+            </div>
 
-                    <div style={{
-                        padding: '1rem',
-                        background: stats?.unreadContacts ? 'var(--warning-bg)' : 'var(--bg-hover)',
-                        borderRadius: 'var(--radius-md)',
-                    }}>
-                        <div className="text-sm text-muted" style={{ marginBottom: '0.5rem' }}>
-                            Pending Review
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <span style={{
-                                fontSize: '1.5rem',
-                                fontWeight: 700,
-                                color: stats?.unreadContacts ? 'var(--warning)' : 'inherit'
-                            }}>
-                                {stats?.unreadContacts || 0}
-                            </span>
-                            <span className="text-muted text-sm">messages</span>
-                        </div>
-                    </div>
+            {/* Quick Actions */}
+            <div>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#0f172a', marginBottom: '1rem', marginTop: '1rem' }}>Quick Actions</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                    {[
+                        { to: '/admin/cars', icon: FiTruck, label: 'Manage Cars' },
+                        { to: '/admin/agents', icon: FiUsers, label: 'Manage Agents' },
+                        { to: '/admin/contacts', icon: FiMail, label: 'View Contacts' },
+                        { to: '/admin/store', icon: FiShoppingBag, label: 'Products' },
+                        { to: '/admin/orders', icon: FiPackage, label: 'Orders' },
+                    ].map((action, i) => (
+                        <Link key={i} to={action.to} style={{ textDecoration: 'none' }}>
+                            <div style={{ background: 'white', borderRadius: '0.75rem', padding: '1.25rem', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', transition: 'all 0.2s', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }} onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)'; e.currentTarget.style.borderColor = '#cbd5e1'; }} onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)'; e.currentTarget.style.borderColor = '#e2e8f0'; }}>
+                                <action.icon size={24} style={{ color: '#475569' }} />
+                                <div style={{ color: '#0f172a', fontSize: '0.875rem', fontWeight: 500 }}>{action.label}</div>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
             </div>
         </div>
