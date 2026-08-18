@@ -48,7 +48,7 @@ app.use(express.json());
 // Serve uploaded files statically
 app.use('/uploads', express.static('uploads'));
 
-// Root health check for Railway
+// Root health check
 app.get('/', (_req, res) => {
     res.json({ status: 'ok', service: 'Kays Drive Backend', timestamp: new Date().toISOString() });
 });

@@ -4,9 +4,9 @@ const prisma = new PrismaClient();
 
 /**
  * Fix corrupted image URLs in the database
- * 
- * Problem: Image URLs were incorrectly prepended with backend URL:
- * Bad:  https://kaysdrive-production.up.railway.apphttps://res.cloudinary.com/...
+ *
+ * Problem: Image URLs were incorrectly prepended with the backend's VPS URL:
+ * Bad:  https://api.kaysdrive.comhttps://res.cloudinary.com/...
  * Good: https://res.cloudinary.com/...
  */
 
@@ -27,7 +27,7 @@ async function cleanImageUrls() {
 
             // Check if any images need fixing
             const needsFixing = images.some(url =>
-                url.includes('up.railway.apphttps') ||
+                url.includes('kaysdrive.comhttps') ||
                 url.includes('localhost:3001https')
             );
 
@@ -39,22 +39,19 @@ async function cleanImageUrls() {
 
             // Fix the URLs
             const fixedImages = images.map(url => {
-                // Remove incorrect backend URL prefix
                 let fixed = url;
 
-                // Pattern 1: https://kaysdrive-production.up.railway.apphttps://...
-                if (url.includes('up.railway.apphttps')) {
-                    fixed = url.split('apphttps')[1] || url;
-                    // Add back missing colon
+                // Pattern 1: https://api.kaysdrive.comhttps://res.cloudinary.com/...
+                if (url.includes('kaysdrive.comhttps')) {
+                    fixed = url.split('comhttps')[1] || url;
                     if (fixed.startsWith('//')) {
                         fixed = 'https:' + fixed;
                     }
                 }
 
-                // Pattern 2: https://kaysdrive-production.up.railway.app/uploads/...
-                // This is local storage (ephemeral) - mark for re-upload
+                // Pattern 2: VPS /uploads/ path (local storage — ephemeral)
                 if (url.includes('/uploads/')) {
-                    console.log(`   ⚠️  Local storage URL detected (will be lost on restart): ${url}`);
+                    console.log(`   ⚠️  Local storage URL detected (re-upload needed): ${url}`);
                 }
 
                 // Pattern 3: http://localhost:3001https://...
