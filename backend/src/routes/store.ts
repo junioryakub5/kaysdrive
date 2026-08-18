@@ -35,6 +35,7 @@ const paystackInitialize = (data: {
     email: string;
     amount: number; // in pesewas (GHS * 100)
     reference: string;
+    callback_url: string;
     metadata: Record<string, any>;
 }): Promise<{ authorization_url: string; access_code: string; reference: string }> => {
     return new Promise((resolve, reject) => {
@@ -49,6 +50,7 @@ const paystackInitialize = (data: {
             amount: data.amount,
             reference: data.reference,
             currency: 'GHS',
+            callback_url: data.callback_url,
             metadata: data.metadata,
         });
 
@@ -418,10 +420,14 @@ storeRouter.post('/checkout', apiLimiter, async (req: Request, res: Response, ne
         // Initialize Paystack payment
         const amountInPesewas = Math.round(total * 100); // GHS to pesewas
         try {
-            const paystackData = await paystackInitialize({
+            const frontendUrl = process.env.FRONTEND_URL || 'https://kaysdrive.com';
+        const callbackUrl = `${frontendUrl}/order-confirmation/${order.orderNumber}?email=${encodeURIComponent(order.customerEmail)}&ref=${paystackRef}`;
+
+        const paystackData = await paystackInitialize({
                 email: order.customerEmail,
                 amount: amountInPesewas,
                 reference: paystackRef,
+                callback_url: callbackUrl,
                 metadata: {
                     orderNumber: order.orderNumber,
                     customerName: order.customerName,
