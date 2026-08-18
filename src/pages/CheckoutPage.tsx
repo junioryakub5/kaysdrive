@@ -81,6 +81,7 @@ export const CheckoutPage = () => {
             });
             if (result.success) {
                 if (result.paymentUrl) {
+                    // ✅ Paystack URL received — redirect to payment page
                     sessionStorage.setItem('pending_order', JSON.stringify({
                         orderNumber: result.orderNumber,
                         email: form.customerEmail,
@@ -88,9 +89,20 @@ export const CheckoutPage = () => {
                     }));
                     clearCart();
                     window.location.href = result.paymentUrl;
+                } else if ((result as any).paymentError) {
+                    // ⚠️ Order created but Paystack init failed — show error, keep cart intact
+                    setServerError(
+                        `Your order (${result.orderNumber}) was created but we could not connect to the payment gateway. ` +
+                        `Please try again or contact support.`
+                    );
                 } else {
+                    // Fallback — order pending, no payment URL
                     clearCart();
-                    navigate(`/order-confirmation/${result.orderNumber}?email=${encodeURIComponent(form.customerEmail)}&ref=${result.paystackRef}&paymentPending=true`);
+                    navigate(
+                        `/order-confirmation/${result.orderNumber}` +
+                        `?email=${encodeURIComponent(form.customerEmail)}` +
+                        `&ref=${result.paystackRef}&paymentPending=true`
+                    );
                 }
             }
         } catch (err: any) {
