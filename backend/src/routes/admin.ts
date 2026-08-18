@@ -76,18 +76,54 @@ adminRouter.get('/me', authMiddleware, async (req: AuthRequest, res: Response) =
 
 adminRouter.get('/stats', authMiddleware, async (_req: Request, res: Response, next: NextFunction) => {
     try {
-        const [totalCars, totalAgents, totalContacts, unreadContacts] = await Promise.all([
+        const [totalCars, totalAgents, totalContacts, unreadContacts, totalOrders, pendingOrders, paidOrders, cancelledOrders] = await Promise.all([
             prisma.car.count(),
             prisma.agent.count({ where: { isActive: true } }),
             prisma.contactSubmission.count(),
             prisma.contactSubmission.count({ where: { isRead: false } }),
+            prisma.order.count(),
+            prisma.order.count({ where: { orderStatus: 'PENDING' } }),
+            prisma.order.count({ where: { paymentStatus: 'PAID' } }),
+            prisma.order.count({ where: { orderStatus: 'CANCELLED' } }),
         ]);
+
+        // Calculate total sales revenue from paid orders
+        const salesAggregate = await prisma.order.aggregate({
+            where: { paymentStatus: 'PAID' },
+            _sum: { total: true },
+        });
+
+        // Recent orders (last 5)
+        const recentOrders = await prisma.order.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            select: {
+                id: true, orderNumber: true, customerName: true,
+                total: true, orderStatus: true, paymentStatus: true, createdAt: true,
+            },
+        });
+
+        // Low stock products (stock < 5)
+        const lowStockProducts = await prisma.product.findMany({
+            where: { isPublished: true, stock: { lt: 5 } },
+            orderBy: { stock: 'asc' },
+            take: 5,
+            select: { id: true, name: true, stock: true, isAvailable: true },
+        });
 
         res.json({
             totalCars,
             totalAgents,
             totalContacts,
             unreadContacts,
+            // E-commerce stats
+            totalOrders,
+            pendingOrders,
+            paidOrders,
+            cancelledOrders,
+            totalRevenue: salesAggregate._sum.total || 0,
+            recentOrders,
+            lowStockProducts,
         });
     } catch (error) {
         next(error);
@@ -637,6 +673,313 @@ adminRouter.get('/analytics/stats', authMiddleware, async (req: AuthRequest, res
             weekVisitors: weekVisitors.length,
             popularPages,
         });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// =============================================================================
+// PRODUCT CATEGORIES CRUD
+// =============================================================================
+
+adminRouter.get('/categories', authMiddleware, async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+        const categories = await prisma.productCategory.findMany({
+            orderBy: { sortOrder: 'asc' },
+            include: { _count: { select: { products: true } } },
+        });
+        res.json(categories.map(c => ({ ...c, productCount: c._count.products })));
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.post('/categories', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { name, description, image, sortOrder, isActive } = req.body;
+        if (!name) throw new AppError('Category name is required', 400);
+        const category = await prisma.productCategory.create({
+            data: { name, description, image, sortOrder: sortOrder ?? 0, isActive: isActive ?? true },
+        });
+        res.status(201).json(category);
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.put('/categories/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { name, description, image, sortOrder, isActive } = req.body;
+        const category = await prisma.productCategory.update({
+            where: { id: req.params.id },
+            data: { name, description, image, sortOrder, isActive },
+        });
+        res.json(category);
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.delete('/categories/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await prisma.productCategory.delete({ where: { id: req.params.id } });
+        res.json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// =============================================================================
+// PRODUCTS CRUD
+// =============================================================================
+
+const parseProductImages = (str: string): string[] => {
+    try { return JSON.parse(str); } catch { return []; }
+};
+
+adminRouter.get('/products', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { search, category, page = '1', limit = '50' } = req.query;
+        const pageNum = Math.max(1, parseInt(page as string) || 1);
+        const limitNum = Math.min(100, parseInt(limit as string) || 50);
+        const skip = (pageNum - 1) * limitNum;
+
+        const where: any = {};
+        if (category) where.categoryId = category as string;
+        if (search) {
+            where.OR = [
+                { name: { contains: search as string, mode: 'insensitive' } },
+                { sku: { contains: search as string, mode: 'insensitive' } },
+            ];
+        }
+
+        const [products, total] = await Promise.all([
+            prisma.product.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limitNum,
+                include: { category: { select: { id: true, name: true } } },
+            }),
+            prisma.product.count({ where }),
+        ]);
+
+        res.json({
+            products: products.map(p => ({ ...p, images: parseProductImages(p.images) })),
+            pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.get('/products/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const product = await prisma.product.findUnique({
+            where: { id: req.params.id },
+            include: { category: { select: { id: true, name: true } } },
+        });
+        if (!product) throw new AppError('Product not found', 404);
+        res.json({ ...product, images: parseProductImages(product.images) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.post('/products', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const {
+            name, shortDescription, description, categoryId,
+            price, discountPrice, sku, stock, images,
+            isAvailable, isFeatured, isPublished,
+        } = req.body;
+
+        if (!name || !description || price === undefined) {
+            throw new AppError('Name, description, and price are required', 400);
+        }
+
+        const product = await prisma.product.create({
+            data: {
+                name, shortDescription, description,
+                categoryId: categoryId || null,
+                price: parseFloat(price),
+                discountPrice: discountPrice ? parseFloat(discountPrice) : null,
+                sku: sku || null,
+                stock: parseInt(stock) || 0,
+                images: JSON.stringify(images || []),
+                isAvailable: isAvailable ?? true,
+                isFeatured: isFeatured ?? false,
+                isPublished: isPublished ?? true,
+            },
+        });
+        res.status(201).json({ ...product, images: parseProductImages(product.images) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.put('/products/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const {
+            name, shortDescription, description, categoryId,
+            price, discountPrice, sku, stock, images,
+            isAvailable, isFeatured, isPublished,
+        } = req.body;
+
+        const updateData: any = {};
+        if (name !== undefined) updateData.name = name;
+        if (shortDescription !== undefined) updateData.shortDescription = shortDescription;
+        if (description !== undefined) updateData.description = description;
+        if (categoryId !== undefined) updateData.categoryId = categoryId || null;
+        if (price !== undefined) updateData.price = parseFloat(price);
+        if (discountPrice !== undefined) updateData.discountPrice = discountPrice ? parseFloat(discountPrice) : null;
+        if (sku !== undefined) updateData.sku = sku || null;
+        if (stock !== undefined) updateData.stock = parseInt(stock);
+        if (images !== undefined) updateData.images = JSON.stringify(images);
+        if (isAvailable !== undefined) updateData.isAvailable = isAvailable;
+        if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
+        if (isPublished !== undefined) updateData.isPublished = isPublished;
+
+        const product = await prisma.product.update({
+            where: { id: req.params.id },
+            data: updateData,
+        });
+        res.json({ ...product, images: parseProductImages(product.images) });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.delete('/products/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await prisma.product.delete({ where: { id: req.params.id } });
+        res.json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.patch('/products/:id/publish', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+        if (!product) throw new AppError('Product not found', 404);
+        const updated = await prisma.product.update({
+            where: { id: req.params.id },
+            data: { isPublished: !product.isPublished },
+        });
+        res.json({ success: true, isPublished: updated.isPublished });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.patch('/products/:id/feature', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+        if (!product) throw new AppError('Product not found', 404);
+        const updated = await prisma.product.update({
+            where: { id: req.params.id },
+            data: { isFeatured: !product.isFeatured },
+        });
+        res.json({ success: true, isFeatured: updated.isFeatured });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.patch('/products/:id/availability', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+        if (!product) throw new AppError('Product not found', 404);
+        const updated = await prisma.product.update({
+            where: { id: req.params.id },
+            data: { isAvailable: !product.isAvailable },
+        });
+        res.json({ success: true, isAvailable: updated.isAvailable });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// =============================================================================
+// ORDERS (Admin View)
+// =============================================================================
+
+adminRouter.get('/orders', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { search, orderStatus, paymentStatus, page = '1', limit = '20' } = req.query;
+        const pageNum = Math.max(1, parseInt(page as string) || 1);
+        const limitNum = Math.min(100, parseInt(limit as string) || 20);
+        const skip = (pageNum - 1) * limitNum;
+
+        const where: any = {};
+        if (orderStatus) where.orderStatus = orderStatus as string;
+        if (paymentStatus) where.paymentStatus = paymentStatus as string;
+        if (search) {
+            where.OR = [
+                { orderNumber: { contains: search as string, mode: 'insensitive' } },
+                { customerName: { contains: search as string, mode: 'insensitive' } },
+                { customerEmail: { contains: search as string, mode: 'insensitive' } },
+            ];
+        }
+
+        const [orders, total] = await Promise.all([
+            prisma.order.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limitNum,
+                include: { items: true },
+            }),
+            prisma.order.count({ where }),
+        ]);
+
+        res.json({
+            orders,
+            pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.get('/orders/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const order = await prisma.order.findUnique({
+            where: { id: req.params.id },
+            include: { items: { include: { product: { select: { id: true, name: true, images: true, stock: true } } } } },
+        });
+        if (!order) throw new AppError('Order not found', 404);
+        res.json(order);
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.patch('/orders/:id/status', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { orderStatus, paymentStatus } = req.body;
+
+        const validOrderStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED'];
+        const validPaymentStatuses = ['PENDING', 'PAID', 'FAILED', 'REFUNDED'];
+
+        const updateData: any = {};
+        if (orderStatus) {
+            if (!validOrderStatuses.includes(orderStatus)) throw new AppError('Invalid order status', 400);
+            updateData.orderStatus = orderStatus;
+        }
+        if (paymentStatus) {
+            if (!validPaymentStatuses.includes(paymentStatus)) throw new AppError('Invalid payment status', 400);
+            updateData.paymentStatus = paymentStatus;
+        }
+
+        if (Object.keys(updateData).length === 0) throw new AppError('No status to update', 400);
+
+        const order = await prisma.order.update({
+            where: { id: req.params.id },
+            data: updateData,
+        });
+        res.json({ success: true, order });
     } catch (error) {
         next(error);
     }

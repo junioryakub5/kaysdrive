@@ -5,11 +5,11 @@ import { Readable } from 'stream';
 
 const uploadRouter = express.Router();
 
-// Configure Cloudinary
+// Configure Cloudinary from environment variables
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dhkh8a7ba',
-    api_key: process.env.CLOUDINARY_API_KEY || '874294128447885',
-    api_secret: process.env.CLOUDINARY_API_SECRET || 'wTXoYBLHVhk6PzPge7ax0X-rQHg',
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 // Use memory storage instead of disk (for Cloudinary upload)
@@ -29,7 +29,7 @@ const upload = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
+        fileSize: 100 * 1024 * 1024, // 100MB limit
     },
 });
 
@@ -55,7 +55,7 @@ const uploadToCloudinary = (buffer: Buffer, folder: string): Promise<string> => 
     });
 };
 
-// Upload single image
+// Upload single image (cars)
 uploadRouter.post('/single', upload.single('image'), async (req: Request, res: Response) => {
     try {
         if (!req.file) {
@@ -70,7 +70,7 @@ uploadRouter.post('/single', upload.single('image'), async (req: Request, res: R
     }
 });
 
-// Upload multiple images (max 10)
+// Upload multiple images for cars (max 10)
 uploadRouter.post('/multiple', upload.array('images', 10), async (req: Request, res: Response) => {
     try {
         if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
@@ -88,11 +88,44 @@ uploadRouter.post('/multiple', upload.array('images', 10), async (req: Request, 
     }
 });
 
+// Upload multiple images for products (max 10)
+uploadRouter.post('/products/multiple', upload.array('images', 10), async (req: Request, res: Response) => {
+    try {
+        if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
+            return res.status(400).json({ error: 'No files uploaded' });
+        }
+
+        const files = req.files as Express.Multer.File[];
+        const uploadPromises = files.map(file => uploadToCloudinary(file.buffer, 'products'));
+        const imageUrls = await Promise.all(uploadPromises);
+
+        res.json({ urls: imageUrls });
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ error: 'Failed to upload images' });
+    }
+});
+
+// Upload single product image
+uploadRouter.post('/products/single', upload.single('image'), async (req: Request, res: Response) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const imageUrl = await uploadToCloudinary(req.file.buffer, 'products');
+        res.json({ url: imageUrl });
+    } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).json({ error: 'Failed to upload image' });
+    }
+});
+
 // Error handling middleware for multer
 uploadRouter.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({ error: 'File size is too large. Maximum size is 5MB.' });
+            return res.status(400).json({ error: 'File size is too large. Maximum size is 100MB.' });
         }
         return res.status(400).json({ error: err.message });
     }

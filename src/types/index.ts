@@ -101,3 +101,79 @@ export interface CarFilters {
     transmission?: string;
     search?: string;
 }
+
+// =============================================================================
+// E-COMMERCE TYPES
+// =============================================================================
+
+export interface ProductCategory {
+    id: string;
+    name: string;
+    description?: string;
+    image?: string;
+    sortOrder: number;
+    isActive: boolean;
+    productCount?: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Product {
+    id: string;
+    name: string;
+    shortDescription?: string;
+    description: string;
+    categoryId?: string;
+    category?: { id: string; name: string };
+    price: number;
+    discountPrice?: number;
+    sku?: string;
+    stock: number;
+    images: string[];
+    isAvailable: boolean;
+    isFeatured: boolean;
+    isPublished: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface CartItem {
+    productId: string;
+    name: string;
+    price: number;
+    originalPrice?: number;
+    quantity: number;
+    subtotal: number;
+    image?: string;
+    stock: number;
+}
+
+export interface OrderItem {
+    id: string;
+    orderId: string;
+    productId?: string;
+    productName: string;
+    productImage?: string;
+    price: number;
+    quantity: number;
+    subtotal: number;
+}
+
+export interface Order {
+    id: string;
+    orderNumber: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone?: string;
+    deliveryAddress?: string;
+    notes?: string;
+    subtotal: number;
+    discount: number;
+    total: number;
+    paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+    orderStatus: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'READY' | 'DISPATCHED' | 'DELIVERED' | 'CANCELLED';
+    items: OrderItem[];
+    createdAt: string;
+    updatedAt: string;
+}
+

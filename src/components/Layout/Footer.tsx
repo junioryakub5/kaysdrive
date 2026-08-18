@@ -19,6 +19,7 @@ export const Footer = () => {
     const quickLinks = [
         { label: 'About Us', href: '/about' },
         { label: 'All Cars', href: '/cars' },
+        { label: 'Shop', href: '/store' },
         { label: 'Services', href: '/services' },
         { label: 'Our Agents', href: '/agents' },
         { label: 'Contact', href: '/contact' },

@@ -49,7 +49,7 @@ const isTokenExpired = (token: string): boolean => {
 // Validate token with backend
 const validateToken = async (token: string, type: 'admin' | 'agent'): Promise<boolean> => {
     try {
-        const endpoint = type === 'admin' ? '/admin/stats' : '/agent/me';
+        const endpoint = type === 'admin' ? '/admin/me' : '/agent/me';
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}${endpoint}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,

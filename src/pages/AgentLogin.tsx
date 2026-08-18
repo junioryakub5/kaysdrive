@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiUser, FiLock, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,8 +11,13 @@ export const AgentLogin = () => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const { loginAgent } = useAuth();
+    const { loginAgent, isAgentAuth, isLoading } = useAuth();
     const navigate = useNavigate();
+
+    // Already logged in — send straight to portal
+    if (!isLoading && isAgentAuth) {
+        return <Navigate to="/agent/dashboard" replace />;
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

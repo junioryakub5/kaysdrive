@@ -4,7 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiTruck, FiUsers, FiMail, FiInbox, FiBarChart2 } from 'react-icons/fi';
+import { FiTruck, FiUsers, FiMail, FiInbox, FiBarChart2, FiShoppingBag, FiPackage, FiDollarSign } from 'react-icons/fi';
 import { adminApi as api, type Stats, type AnalyticsStats } from '../../services/adminApi';
 import { PageHeader, StatCard } from '../../components/Dashboard/UI';
 
@@ -41,7 +41,7 @@ export default function Dashboard() {
                 subtitle="Welcome to the Carz Admin Dashboard"
             />
 
-            {/* Stats Grid */}
+            {/* Stats Grid - Core */}
             <div className="stats-grid">
                 <StatCard
                     icon={<FiTruck className="w-6 h-6" />}
@@ -72,6 +72,33 @@ export default function Dashboard() {
                     link="/admin/contacts"
                 />
             </div>
+
+            {/* E-Commerce Stats */}
+            {(stats as any)?.totalOrders !== undefined && (
+                <div className="stats-grid" style={{ marginTop: '1.5rem' }}>
+                    <StatCard
+                        icon={<FiPackage className="w-6 h-6" />}
+                        label="Total Orders"
+                        value={(stats as any).totalOrders || 0}
+                        color="primary"
+                        link="/admin/orders"
+                    />
+                    <StatCard
+                        icon={<FiShoppingBag className="w-6 h-6" />}
+                        label="Pending Orders"
+                        value={(stats as any).pendingOrders || 0}
+                        color={(stats as any).pendingOrders > 0 ? 'warning' : 'primary'}
+                        link="/admin/orders"
+                    />
+                    <StatCard
+                        icon={<FiDollarSign className="w-6 h-6" />}
+                        label="Total Revenue"
+                        value={`GHS ${((stats as any).totalRevenue || 0).toFixed(2)}`}
+                        color="success"
+                        link="/admin/orders"
+                    />
+                </div>
+            )}
 
             {/* Visitor Analytics Section */}
             <div className="dashboard-card" style={{ marginTop: '2rem' }}>
@@ -189,8 +216,44 @@ export default function Dashboard() {
                     <Link to="/admin/contacts" className="btn btn-secondary">
                         <FiMail className="inline mr-2" /> View Contacts
                     </Link>
+                    <Link to="/admin/store" className="btn btn-secondary">
+                        <FiShoppingBag className="inline mr-2" /> Products
+                    </Link>
+                    <Link to="/admin/orders" className="btn btn-secondary">
+                        <FiPackage className="inline mr-2" /> Orders
+                    </Link>
                 </div>
             </div>
+
+            {/* Recent Orders */}
+            {(stats as any)?.recentOrders?.length > 0 && (
+                <div className="dashboard-card" style={{ marginTop: '1.5rem' }}>
+                    <h3 className="section-title">Recent Orders</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {(stats as any).recentOrders.map((order: any) => (
+                            <div key={order.id} style={{
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                padding: '0.75rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
+                                flexWrap: 'wrap', gap: '0.5rem',
+                            }}>
+                                <div>
+                                    <div style={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '0.85rem', color: 'var(--primary)' }}>{order.orderNumber}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.customerName}</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontWeight: 600 }}>GHS {parseFloat(order.total).toFixed(2)}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                        {order.paymentStatus} · {order.orderStatus}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ textAlign: 'right', marginTop: '0.75rem' }}>
+                        <Link to="/admin/orders" style={{ fontSize: '0.875rem', color: 'var(--primary)', fontWeight: 600 }}>View all orders →</Link>
+                    </div>
+                </div>
+            )}
 
             {/* Platform Overview */}
             <div className="dashboard-card" style={{ marginTop: '1.5rem' }}>

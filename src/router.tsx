@@ -25,6 +25,16 @@ const AdminContacts = lazy(() => import('./pages/Admin/Contacts'));
 const AdminServices = lazy(() => import('./pages/Admin/Services'));
 const AdminFAQs = lazy(() => import('./pages/Admin/FAQs'));
 const AdminTestimonials = lazy(() => import('./pages/Admin/Testimonials'));
+const AdminStore = lazy(() => import('./pages/Admin/Store'));
+const AdminCategories = lazy(() => import('./pages/Admin/Categories'));
+const AdminOrders = lazy(() => import('./pages/Admin/Orders'));
+
+// Store Pages (Lazy loaded)
+const StorePage = lazy(() => import('./pages/StorePage').then(m => ({ default: m.StorePage })));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage').then(m => ({ default: m.ProductDetailPage })));
+const CartPage = lazy(() => import('./pages/CartPage').then(m => ({ default: m.CartPage })));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
+const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage').then(m => ({ default: m.OrderConfirmationPage })));
 
 // Agent Pages (Lazy loaded)
 const AgentDashboard = lazy(() => import('./pages/Agent/Dashboard'));
@@ -76,6 +86,27 @@ export const router = createBrowserRouter([
                 path: 'agent-login',
                 element: <AgentLogin />,
             },
+            // Store / E-Commerce routes
+            {
+                path: 'store',
+                element: <StorePage />,
+            },
+            {
+                path: 'store/products/:id',
+                element: <ProductDetailPage />,
+            },
+            {
+                path: 'cart',
+                element: <CartPage />,
+            },
+            {
+                path: 'checkout',
+                element: <CheckoutPage />,
+            },
+            {
+                path: 'order-confirmation/:orderNumber',
+                element: <OrderConfirmationPage />,
+            },
         ],
     },
     // Admin Routes (Protected)
@@ -114,6 +145,19 @@ export const router = createBrowserRouter([
             {
                 path: 'testimonials',
                 element: <AdminTestimonials />,
+            },
+            // E-Commerce admin routes
+            {
+                path: 'store',
+                element: <AdminStore />,
+            },
+            {
+                path: 'categories',
+                element: <AdminCategories />,
+            },
+            {
+                path: 'orders',
+                element: <AdminOrders />,
             },
         ],
     },

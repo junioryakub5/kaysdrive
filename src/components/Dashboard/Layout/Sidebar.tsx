@@ -26,6 +26,10 @@ const adminNavItems: NavItem[] = [
     { path: '/admin/services', label: 'Services', icon: '🔧' },
     { path: '/admin/faqs', label: 'FAQs', icon: '❓' },
     { path: '/admin/testimonials', label: 'Testimonials', icon: '💬' },
+    // E-Commerce
+    { path: '/admin/store', label: 'Products', icon: '🛍️' },
+    { path: '/admin/categories', label: 'Categories', icon: '🏷️' },
+    { path: '/admin/orders', label: 'Orders', icon: '📦' },
 ];
 
 const agentNavItems: NavItem[] = [

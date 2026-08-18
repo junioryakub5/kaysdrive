@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // =============================================================================
@@ -156,4 +157,88 @@ model Admin {
 
   @@index([email])
   @@index([isActive])
+}
+
+// =============================================================================
+// E-COMMERCE MODELS
+// =============================================================================
+
+model ProductCategory {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  image       String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model Product {
+  id               String           @id @default(uuid())
+  name             String
+  shortDescription String?
+  description      String
+  categoryId       String?
+  category         ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  price            Float
+  discountPrice    Float?
+  sku              String?          @unique
+  stock            Int              @default(0)
+  images           String           @default("[]") // JSON array of Cloudinary URLs
+  isAvailable      Boolean          @default(true)
+  isFeatured       Boolean          @default(false)
+  isPublished      Boolean          @default(true)
+  orderItems       OrderItem[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([isAvailable])
+  @@index([isFeatured])
+  @@index([isPublished])
+  @@index([categoryId])
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  deliveryAddress String?
+  notes           String?
+  subtotal        Float
+  discount        Float       @default(0)
+  total           Float
+  paymentStatus   String      @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  orderStatus     String      @default("PENDING") // PENDING, CONFIRMED, PROCESSING, READY, DISPATCHED, DELIVERED, CANCELLED
+  paystackRef     String?     @unique
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([customerEmail])
+  @@index([orderStatus])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id           String   @id @default(uuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName  String   // snapshot at time of purchase
+  productImage String?  // snapshot
+  price        Float    // price snapshot at time of purchase
+  quantity     Int
+  subtotal     Float
+
+  @@index([orderId])
+  @@index([productId])
 }

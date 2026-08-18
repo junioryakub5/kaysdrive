@@ -9,8 +9,12 @@ import { adminRouter } from './routes/admin.js';
 import { agentRouter } from './routes/agent.js';
 import { uploadRouter } from './routes/upload.js';
 import analyticsRouter from './routes/analytics.js';
+import { storeRouter } from './routes/store.js';
 
 const app = express();
+
+// Trust Nginx reverse proxy (required for rate limiting + correct IP detection)
+app.set('trust proxy', 1);
 
 // Middleware - Allow frontend, admin, and agent portal origins
 const allowedOrigins = config.corsOrigin
@@ -44,6 +48,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/agent', agentRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/analytics', analyticsRouter);
+app.use('/api/store', storeRouter);
 
 
 // Error handler

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { FiSearch, FiMenu, FiX, FiShoppingCart } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoginDropdown } from './LoginDropdown';
+import { useCart } from '../../contexts/CartContext';
 
 const navItems = [
     { label: 'Home', href: '/' },
     { label: 'Cars', href: '/cars' },
+    { label: 'Store', href: '/store' },
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/services' },
     { label: 'Agents', href: '/agents' },
@@ -17,6 +19,7 @@ export const Header = () => {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
+    const { itemCount } = useCart();
 
     // Check if we're on pages that need light navbar initially
     const isHomePage = location.pathname === '/';
@@ -126,6 +129,21 @@ export const Header = () => {
 
                         {/* Login Dropdown */}
                         <LoginDropdown showTransparentNav={showTransparentNav} />
+
+                        {/* Cart Icon */}
+                        <Link to="/cart" className="relative">
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <FiShoppingCart className={`w-5 h-5 ${showTransparentNav ? 'text-white' : 'text-gray-900'}`} />
+                                {itemCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                                        {itemCount > 9 ? '9+' : itemCount}
+                                    </span>
+                                )}
+                            </motion.div>
+                        </Link>
 
                         <Link to="/contact">
                             <motion.button

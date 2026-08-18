@@ -9,11 +9,15 @@ const axiosInstance = axios.create({
     timeout: 15000, // 15 second timeout for cold starts
 });
 
+// Prevent multiple concurrent 401 redirects
+let adminRedirecting = false;
+
 // Response interceptor to handle auth errors
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 && !adminRedirecting) {
+            adminRedirecting = true;
             // Clear admin token and redirect to login
             localStorage.removeItem('admin');
             localStorage.removeItem('admin_token');
@@ -181,11 +185,15 @@ const agentAxiosInstance = axios.create({
     timeout: 15000,
 });
 
+// Prevent multiple concurrent 401 redirects
+let agentRedirecting = false;
+
 // Agent auth error interceptor
 agentAxiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 && !agentRedirecting) {
+            agentRedirecting = true;
             // Clear agent token
             localStorage.removeItem('agent');
             localStorage.removeItem('agent_token');
@@ -211,3 +219,59 @@ export const agentApi = {
     getProfile: () => agentAxiosInstance.get('/me', { headers: getAgentAuthHeaders() }).then(res => res.data),
     updateProfile: (data: any) => agentAxiosInstance.put('/me', data, { headers: getAgentAuthHeaders() }).then(res => res.data),
 };
+
+// =============================================================================
+// ADMIN STORE API
+// =============================================================================
+
+export const adminStoreApi = {
+    // ── Categories ────────────────────────────────────────────────────────────
+    getCategories: () =>
+        axiosInstance.get('/categories', { headers: getAdminAuthHeaders() }).then(r => r.data),
+    createCategory: (data: any) =>
+        axiosInstance.post('/categories', data, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    updateCategory: (id: string, data: any) =>
+        axiosInstance.put(`/categories/${id}`, data, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    deleteCategory: (id: string) =>
+        axiosInstance.delete(`/categories/${id}`, { headers: getAdminAuthHeaders() }).then(r => r.data),
+
+    // ── Products ──────────────────────────────────────────────────────────────
+    getProducts: (params?: { search?: string; category?: string; page?: number; limit?: number }) => {
+        const query = new URLSearchParams();
+        if (params?.search) query.set('search', params.search);
+        if (params?.category) query.set('category', params.category);
+        if (params?.page) query.set('page', String(params.page));
+        if (params?.limit) query.set('limit', String(params.limit));
+        return axiosInstance.get(`/products?${query}`, { headers: getAdminAuthHeaders() }).then(r => r.data);
+    },
+    getProduct: (id: string) =>
+        axiosInstance.get(`/products/${id}`, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    createProduct: (data: any) =>
+        axiosInstance.post('/products', data, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    updateProduct: (id: string, data: any) =>
+        axiosInstance.put(`/products/${id}`, data, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    deleteProduct: (id: string) =>
+        axiosInstance.delete(`/products/${id}`, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    togglePublish: (id: string) =>
+        axiosInstance.patch(`/products/${id}/publish`, {}, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    toggleFeature: (id: string) =>
+        axiosInstance.patch(`/products/${id}/feature`, {}, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    toggleAvailability: (id: string) =>
+        axiosInstance.patch(`/products/${id}/availability`, {}, { headers: getAdminAuthHeaders() }).then(r => r.data),
+
+    // ── Orders ────────────────────────────────────────────────────────────────
+    getOrders: (params?: { search?: string; orderStatus?: string; paymentStatus?: string; page?: number; limit?: number }) => {
+        const query = new URLSearchParams();
+        if (params?.search) query.set('search', params.search);
+        if (params?.orderStatus) query.set('orderStatus', params.orderStatus);
+        if (params?.paymentStatus) query.set('paymentStatus', params.paymentStatus);
+        if (params?.page) query.set('page', String(params.page));
+        if (params?.limit) query.set('limit', String(params.limit));
+        return axiosInstance.get(`/orders?${query}`, { headers: getAdminAuthHeaders() }).then(r => r.data);
+    },
+    getOrder: (id: string) =>
+        axiosInstance.get(`/orders/${id}`, { headers: getAdminAuthHeaders() }).then(r => r.data),
+    updateOrderStatus: (id: string, data: { orderStatus?: string; paymentStatus?: string }) =>
+        axiosInstance.patch(`/orders/${id}/status`, data, { headers: getAdminAuthHeaders() }).then(r => r.data),
+};
+
