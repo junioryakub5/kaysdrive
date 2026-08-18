@@ -6,12 +6,12 @@ export const HeroSection = () => {
         <section
             className="relative min-h-screen flex items-center justify-center bg-cover bg-center"
             style={{
-                backgroundImage: 'url(/images/hero-bmw.png)',
-                backgroundPosition: 'center',
+                backgroundImage: 'url(/images/hero-kaysdrive.jpg)',
+                backgroundPosition: 'center 40%',
             }}
         >
             {/* Dark Overlay */}
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-black/50" />
 
             {/* Content */}
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-32">
