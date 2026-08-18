@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { adminStoreApi } from '../../services/adminApi';
-import { PageHeader, Modal, ConfirmDialog, SearchBar } from '../../components/Dashboard/UI';
+import { PageHeader, Modal, ConfirmDialog, SearchBar, StatusBadge } from '../../components/Dashboard/UI';
 import type { ProductCategory } from '../../types';
 
 type FormState = {
@@ -150,9 +150,9 @@ export default function AdminCategories() {
                                     </td>
                                     <td style={{ color: 'var(--text-secondary)' }}>{cat.sortOrder}</td>
                                     <td>
-                                        <span className={`badge ${cat.isActive ? 'badge-success' : 'badge-neutral'}`}>
+                                        <StatusBadge status={cat.isActive ? 'success' : 'neutral'}>
                                             {cat.isActive ? 'Active' : 'Inactive'}
-                                        </span>
+                                        </StatusBadge>
                                     </td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>

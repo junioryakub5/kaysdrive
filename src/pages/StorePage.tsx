@@ -181,9 +181,9 @@ export const StorePage = () => {
             />
             <PageHero
                 title="Shop"
-                subtitle="Browse our handpicked collection of premium products"
-                breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
+                breadcrumbs={[{ label: 'Shop' }]}
             />
+
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
                 {/* Toolbar */}

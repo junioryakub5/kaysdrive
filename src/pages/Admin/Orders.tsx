@@ -12,7 +12,7 @@ const formatDate = (s: string) =>
 const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED'];
 const PAYMENT_STATUSES = ['PENDING', 'PAID', 'FAILED', 'REFUNDED'];
 
-const orderStatusColor: Record<string, string> = {
+const orderStatusType: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
     PENDING: 'warning',
     CONFIRMED: 'info',
     PROCESSING: 'info',
@@ -21,7 +21,7 @@ const orderStatusColor: Record<string, string> = {
     DELIVERED: 'success',
     CANCELLED: 'danger',
 };
-const paymentStatusColor: Record<string, string> = {
+const paymentStatusType: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
     PENDING: 'warning',
     PAID: 'success',
     FAILED: 'danger',
@@ -153,14 +153,14 @@ export default function AdminOrders() {
                                     <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{formatDate(order.createdAt)}</td>
                                     <td style={{ fontWeight: 700 }}>{formatPrice(order.total)}</td>
                                     <td>
-                                        <span className={`badge badge-${paymentStatusColor[order.paymentStatus] || 'neutral'}`}>
+                                        <StatusBadge status={paymentStatusType[order.paymentStatus] || 'neutral'}>
                                             {order.paymentStatus}
-                                        </span>
+                                        </StatusBadge>
                                     </td>
                                     <td>
-                                        <span className={`badge badge-${orderStatusColor[order.orderStatus] || 'neutral'}`}>
+                                        <StatusBadge status={orderStatusType[order.orderStatus] || 'neutral'}>
                                             {order.orderStatus}
-                                        </span>
+                                        </StatusBadge>
                                     </td>
                                     <td>
                                         <button className="action-btn" onClick={() => openOrder(order)}>View</button>

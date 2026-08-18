@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { adminStoreApi } from '../../services/adminApi';
 import { ImageUpload } from '../../components/Shared/ImageUpload';
-import { PageHeader, Modal, ConfirmDialog, SearchBar, StatusBadge } from '../../components/Dashboard/UI';
+import { PageHeader, Modal, ConfirmDialog, SearchBar, StatusBadge, getStatusType } from '../../components/Dashboard/UI';
 import type { Product, ProductCategory } from '../../types';
 
 const UPLOAD_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/upload/products/multiple`;
@@ -226,9 +226,9 @@ export default function AdminProducts() {
                                     </td>
                                     <td>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                            <StatusBadge status={p.isPublished ? 'Published' : 'Draft'} />
-                                            {p.isFeatured && <StatusBadge status="Featured" />}
-                                            {!p.isAvailable && <StatusBadge status="Unavailable" />}
+                                            <StatusBadge status={p.isPublished ? 'success' : 'neutral'}>{p.isPublished ? 'Published' : 'Draft'}</StatusBadge>
+                                            {p.isFeatured && <StatusBadge status="info">Featured</StatusBadge>}
+                                            {!p.isAvailable && <StatusBadge status="warning">Unavailable</StatusBadge>}
                                         </div>
                                     </td>
                                     <td>
