@@ -265,6 +265,9 @@ export const OrderConfirmationPage = () => {
                     <Link to="/store" className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-colors text-center">
                         Continue Shopping
                     </Link>
+                    <Link to="/track-order" className="border border-gray-200 hover:border-red-400 text-gray-700 hover:text-red-600 px-6 py-3 rounded-xl font-semibold text-sm transition-colors text-center">
+                        Track This Order
+                    </Link>
                     <Link to="/contact" className="border border-gray-200 hover:border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold text-sm transition-colors text-center">
                         Need Help?
                     </Link>

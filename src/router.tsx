@@ -35,6 +35,7 @@ const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage').then(m 
 const CartPage = lazy(() => import('./pages/CartPage').then(m => ({ default: m.CartPage })));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
 const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage').then(m => ({ default: m.OrderConfirmationPage })));
+const TrackOrderPage = lazy(() => import('./pages/TrackOrderPage').then(m => ({ default: m.TrackOrderPage })));
 
 // Agent Pages (Lazy loaded)
 const AgentDashboard = lazy(() => import('./pages/Agent/Dashboard'));
@@ -106,6 +107,10 @@ export const router = createBrowserRouter([
             {
                 path: 'order-confirmation/:orderNumber',
                 element: <OrderConfirmationPage />,
+            },
+            {
+                path: 'track-order',
+                element: <TrackOrderPage />,
             },
         ],
     },

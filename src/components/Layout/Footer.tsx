@@ -20,11 +20,13 @@ export const Footer = () => {
         { label: 'About Us', href: '/about' },
         { label: 'All Cars', href: '/cars' },
         { label: 'Shop', href: '/store' },
+        { label: 'Track Order', href: '/track-order' },
         { label: 'Services', href: '/services' },
         { label: 'Our Agents', href: '/agents' },
         { label: 'Contact', href: '/contact' },
         { label: 'FAQ', href: '/faq' },
     ];
+
 
     return (
         <footer className="bg-gray-900 text-white py-16">
