@@ -156,100 +156,192 @@ export const OrderConfirmationPage = () => {
     const isFailed       = order.paymentStatus === 'FAILED';
     const canRefresh     = order.paymentStatus === 'PENDING' && !!referenceToVerify;
 
-    // ── Receipt generator ──────────────────────────────────────────────────────
-    const downloadReceipt = () => {
-        const receiptWindow = window.open('', '_blank');
-        if (!receiptWindow) return;
+    // ── Receipt generator (instant PDF download) ─────────────────────────────
+    const downloadReceipt = async () => {
+        const { default: jsPDF } = await import('jspdf');
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const w = doc.internal.pageSize.getWidth();
+        let y = 20;
 
-        const itemRows = order.items.map(item => `
-            <tr>
-                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#333;">${item.productName}</td>
-                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;text-align:center;font-size:13px;color:#666;">${item.quantity}</td>
-                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;text-align:right;font-size:13px;color:#666;">${formatPrice(item.price)}</td>
-                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;text-align:right;font-size:13px;font-weight:600;color:#333;">${formatPrice(item.subtotal)}</td>
-            </tr>
-        `).join('');
+        const gray = '#666666';
+        const dark = '#111111';
+        const red = '#dc2626';
+        const light = '#999999';
+        const leftM = 20;
+        const rightM = w - 20;
 
-        const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Receipt - ${order.orderNumber}</title>
-<style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:#333; background:#fff; padding:40px; max-width:700px; margin:0 auto; }
-    @media print { body { padding:20px; } .no-print { display:none !important; } }
-</style></head><body>
+        // ── Header ──
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(dark);
+        doc.text("KAY'S", leftM, y);
+        const kaysW = doc.getTextWidth("KAY'S ");
+        doc.setTextColor(red);
+        doc.text('DRIVE', leftM + kaysW, y);
 
-<!-- Header -->
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid #dc2626;">
-    <div>
-        <h1 style="font-size:22px;font-weight:800;color:#111;letter-spacing:-0.5px;">KAY'S <span style="color:#dc2626;">DRIVE</span></h1>
-        <p style="font-size:11px;color:#999;margin-top:4px;">KAYS DRIVE 25 ENTERPRISE</p>
-        <p style="font-size:11px;color:#999;">Kumasi, Ghana</p>
-    </div>
-    <div style="text-align:right;">
-        <h2 style="font-size:18px;font-weight:700;color:#111;margin-bottom:6px;">RECEIPT</h2>
-        <p style="font-size:12px;color:#666;"><strong>#${order.orderNumber}</strong></p>
-        <p style="font-size:12px;color:#666;">${formatDate(order.createdAt)}</p>
-        <span style="display:inline-block;margin-top:8px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;${isPaid ? 'background:#dcfce7;color:#15803d;' : 'background:#fef9c3;color:#a16207;'}">
-            ${isPaid ? '✓ PAID' : order.paymentStatus}
-        </span>
-    </div>
-</div>
+        doc.setFontSize(9);
+        doc.setTextColor(light);
+        doc.setFont('helvetica', 'normal');
+        doc.text('KAYS DRIVE 25 ENTERPRISE', leftM, y + 5);
+        doc.text('Kumasi, Ghana', leftM, y + 9);
 
-<!-- Customer -->
-<div style="margin-bottom:30px;padding:16px 20px;background:#f9fafb;border-radius:8px;">
-    <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:10px;">Bill To</h3>
-    <p style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">${order.customerName}</p>
-    <p style="font-size:12px;color:#666;">${order.customerEmail}</p>
-    ${order.customerPhone ? `<p style="font-size:12px;color:#666;">${order.customerPhone}</p>` : ''}
-    ${order.deliveryAddress ? `<p style="font-size:12px;color:#666;margin-top:4px;">${order.deliveryAddress}</p>` : ''}
-</div>
+        // Right side - RECEIPT title
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(dark);
+        doc.text('RECEIPT', rightM, y, { align: 'right' });
 
-<!-- Items -->
-<table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-    <thead>
-        <tr style="border-bottom:2px solid #e5e7eb;">
-            <th style="padding:8px 0;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Product</th>
-            <th style="padding:8px 0;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Qty</th>
-            <th style="padding:8px 0;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Price</th>
-            <th style="padding:8px 0;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Total</th>
-        </tr>
-    </thead>
-    <tbody>${itemRows}</tbody>
-</table>
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(gray);
+        doc.text(`#${order.orderNumber}`, rightM, y + 6, { align: 'right' });
 
-<!-- Totals -->
-<div style="margin-left:auto;width:220px;">
-    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
-        <span>Subtotal</span><span>${formatPrice(order.subtotal)}</span>
-    </div>
-    ${order.discount > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#16a34a;">
-        <span>Discount</span><span>-${formatPrice(order.discount)}</span>
-    </div>` : ''}
-    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
-        <span>Delivery</span><span style="font-style:italic;color:#999;">Arranged</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;padding:12px 0 0;margin-top:8px;border-top:2px solid #111;font-size:16px;font-weight:700;color:#111;">
-        <span>Total</span><span>${formatPrice(order.total)}</span>
-    </div>
-</div>
+        doc.setFont('helvetica', 'normal');
+        doc.text(formatDate(order.createdAt), rightM, y + 11, { align: 'right' });
 
-<!-- Footer -->
-<div style="margin-top:50px;padding-top:20px;border-top:1px solid #e5e7eb;text-align:center;">
-    <p style="font-size:11px;color:#999;">Thank you for shopping with Kays Drive!</p>
-    <p style="font-size:11px;color:#bbb;margin-top:4px;">www.kaysdrive.com</p>
-</div>
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        if (isPaid) {
+            doc.setTextColor('#15803d');
+            doc.text('PAID', rightM, y + 17, { align: 'right' });
+        } else {
+            doc.setTextColor('#a16207');
+            doc.text(order.paymentStatus, rightM, y + 17, { align: 'right' });
+        }
 
-<!-- Print button -->
-<div class="no-print" style="text-align:center;margin-top:30px;">
-    <button onclick="window.print()" style="background:#dc2626;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">
-        Print / Save as PDF
-    </button>
-</div>
+        // Red line
+        y += 24;
+        doc.setDrawColor(red);
+        doc.setLineWidth(0.6);
+        doc.line(leftM, y, rightM, y);
 
-</body></html>`;
+        // ── Bill To ──
+        y += 10;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(light);
+        doc.text('BILL TO', leftM, y);
 
-        receiptWindow.document.write(html);
-        receiptWindow.document.close();
+        y += 6;
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(dark);
+        doc.text(order.customerName, leftM, y);
+
+        y += 5;
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(gray);
+        doc.text(order.customerEmail, leftM, y);
+
+        if (order.customerPhone) {
+            y += 4.5;
+            doc.text(order.customerPhone, leftM, y);
+        }
+        if (order.deliveryAddress) {
+            y += 4.5;
+            doc.text(order.deliveryAddress, leftM, y);
+        }
+
+        // ── Items Table ──
+        y += 12;
+        doc.setDrawColor('#e5e7eb');
+        doc.setLineWidth(0.4);
+        doc.line(leftM, y, rightM, y);
+
+        y += 6;
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(light);
+        doc.text('PRODUCT', leftM, y);
+        doc.text('QTY', w / 2 + 15, y, { align: 'center' });
+        doc.text('PRICE', w / 2 + 40, y, { align: 'right' });
+        doc.text('TOTAL', rightM, y, { align: 'right' });
+
+        y += 3;
+        doc.setDrawColor('#e5e7eb');
+        doc.line(leftM, y, rightM, y);
+
+        // Items
+        order.items.forEach(item => {
+            y += 7;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(dark);
+
+            // Truncate long names
+            const maxNameW = w / 2 - 5;
+            let name = item.productName;
+            while (doc.getTextWidth(name) > maxNameW && name.length > 10) {
+                name = name.slice(0, -4) + '...';
+            }
+            doc.text(name, leftM, y);
+
+            doc.setTextColor(gray);
+            doc.text(String(item.quantity), w / 2 + 15, y, { align: 'center' });
+            doc.text(formatPrice(item.price), w / 2 + 40, y, { align: 'right' });
+
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(dark);
+            doc.text(formatPrice(item.subtotal), rightM, y, { align: 'right' });
+
+            y += 3;
+            doc.setDrawColor('#f0f0f0');
+            doc.setLineWidth(0.2);
+            doc.line(leftM, y, rightM, y);
+        });
+
+        // ── Totals ──
+        const totalsX = w / 2 + 20;
+        y += 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(gray);
+        doc.text('Subtotal', totalsX, y);
+        doc.text(formatPrice(order.subtotal), rightM, y, { align: 'right' });
+
+        if (order.discount > 0) {
+            y += 6;
+            doc.setTextColor('#16a34a');
+            doc.text('Discount', totalsX, y);
+            doc.text(`-${formatPrice(order.discount)}`, rightM, y, { align: 'right' });
+        }
+
+        y += 6;
+        doc.setTextColor(gray);
+        doc.text('Delivery', totalsX, y);
+        doc.setFont('helvetica', 'italic');
+        doc.text('Arranged', rightM, y, { align: 'right' });
+
+        y += 4;
+        doc.setDrawColor(dark);
+        doc.setLineWidth(0.5);
+        doc.line(totalsX, y, rightM, y);
+
+        y += 7;
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(dark);
+        doc.text('Total', totalsX, y);
+        doc.text(formatPrice(order.total), rightM, y, { align: 'right' });
+
+        // ── Footer ──
+        y += 25;
+        doc.setDrawColor('#e5e7eb');
+        doc.setLineWidth(0.3);
+        doc.line(leftM, y, rightM, y);
+
+        y += 8;
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(light);
+        doc.text('Thank you for shopping with Kays Drive!', w / 2, y, { align: 'center' });
+        y += 5;
+        doc.setTextColor('#cccccc');
+        doc.text('www.kaysdrive.com', w / 2, y, { align: 'center' });
+
+        // Save
+        doc.save(`KaysDrive-Receipt-${order.orderNumber}.pdf`);
     };
 
     return (
