@@ -421,9 +421,9 @@ storeRouter.post('/checkout', apiLimiter, async (req: Request, res: Response, ne
         const amountInPesewas = Math.round(total * 100); // GHS to pesewas
         try {
             const frontendUrl = process.env.FRONTEND_URL || 'https://kaysdrive.com';
-        const callbackUrl = `${frontendUrl}/order-confirmation/${order.orderNumber}?email=${encodeURIComponent(order.customerEmail)}&ref=${paystackRef}`;
+            const callbackUrl = `${frontendUrl}/order-confirmation/${order.orderNumber}?email=${encodeURIComponent(order.customerEmail)}&ref=${paystackRef}`;
 
-        const paystackData = await paystackInitialize({
+            const paystackData = await paystackInitialize({
                 email: order.customerEmail,
                 amount: amountInPesewas,
                 reference: paystackRef,
@@ -444,8 +444,7 @@ storeRouter.post('/checkout', apiLimiter, async (req: Request, res: Response, ne
                 paystackRef,
             });
         } catch (paystackError: any) {
-            // If Paystack init fails, keep order as PENDING but return the reference
-            // Customer can retry payment
+            // If Paystack init fails, keep order as PENDING but return an error
             console.error('Paystack initialization error:', paystackError.message);
             res.json({
                 success: true,

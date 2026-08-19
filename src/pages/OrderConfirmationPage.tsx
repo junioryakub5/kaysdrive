@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     FiCheckCircle, FiClock, FiXCircle, FiPackage,
-    FiArrowRight, FiRefreshCw, FiShoppingBag,
+    FiArrowRight, FiRefreshCw, FiShoppingBag, FiAlertCircle,
 } from 'react-icons/fi';
 import { storeApi } from '../services/storeApi';
 import type { Order } from '../types';
@@ -19,12 +19,12 @@ const ORDER_STATUS_STEPS = ['PENDING', 'CONFIRMED', 'PROCESSING', 'READY', 'DISP
 
 const ORDER_STATUS_LABELS: Record<string, { label: string; color: string; icon: React.ElementType; description: string }> = {
     PENDING:    { label: 'Pending',    color: 'text-yellow-600', icon: FiClock,        description: 'Your order is being reviewed.' },
-    CONFIRMED:  { label: 'Confirmed',  color: 'text-blue-600',   icon: FiCheckCircle, description: 'Your order has been confirmed and is being prepared.' },
-    PROCESSING: { label: 'Processing', color: 'text-blue-600',   icon: FiRefreshCw,   description: 'Your order is being processed.' },
-    READY:      { label: 'Ready',      color: 'text-green-600',  icon: FiPackage,     description: 'Your order is packed and ready.' },
-    DISPATCHED: { label: 'Dispatched', color: 'text-green-600',  icon: FiArrowRight,  description: 'Your order is on its way!' },
-    DELIVERED:  { label: 'Delivered',  color: 'text-green-600',  icon: FiCheckCircle, description: 'Your order has been delivered. Enjoy!' },
-    CANCELLED:  { label: 'Cancelled',  color: 'text-red-600',    icon: FiXCircle,     description: 'This order was cancelled.' },
+    CONFIRMED:  { label: 'Confirmed',  color: 'text-blue-600',   icon: FiCheckCircle,  description: 'Your order has been confirmed and is being prepared.' },
+    PROCESSING: { label: 'Processing', color: 'text-blue-600',   icon: FiRefreshCw,    description: 'Your order is being processed.' },
+    READY:      { label: 'Ready',      color: 'text-green-600',  icon: FiPackage,      description: 'Your order is packed and ready.' },
+    DISPATCHED: { label: 'Dispatched', color: 'text-green-600',  icon: FiArrowRight,   description: 'Your order is on its way!' },
+    DELIVERED:  { label: 'Delivered',  color: 'text-green-600',  icon: FiCheckCircle,  description: 'Your order has been delivered. Enjoy!' },
+    CANCELLED:  { label: 'Cancelled',  color: 'text-red-600',    icon: FiXCircle,      description: 'This order was cancelled.' },
 };
 
 const PAYMENT_STATUS_LABELS: Record<string, { label: string; color: string; bg: string; dot: string }> = {
@@ -37,92 +37,131 @@ const PAYMENT_STATUS_LABELS: Record<string, { label: string; color: string; bg: 
 export const OrderConfirmationPage = () => {
     const { orderNumber } = useParams<{ orderNumber: string }>();
     const [searchParams] = useSearchParams();
-    const email       = searchParams.get('email') || '';
-    const paystackRef = searchParams.get('ref')   || '';
+
+    // Our params (set in callback_url during checkout)
+    const email          = searchParams.get('email') || '';
+    const paystackRef    = searchParams.get('ref')   || '';
     const paymentPending = searchParams.get('paymentPending') === 'true';
+
+    // Paystack also appends these when redirecting — use as fallback reference
+    const paystackReference = searchParams.get('reference') || searchParams.get('trxref') || '';
+
+    // The reference to verify: prefer our `ref` param, fall back to Paystack's `reference`
+    const referenceToVerify = paystackRef || paystackReference;
 
     const [order,     setOrder]     = useState<Order | null>(null);
     const [loading,   setLoading]   = useState(true);
     const [verifying, setVerifying] = useState(false);
     const [error,     setError]     = useState('');
+    const [verifyMsg, setVerifyMsg] = useState('');
 
-    const loadOrder = async () => {
-        if (!orderNumber || !email) { setError('Order not found'); setLoading(false); return; }
+    // ── Load order from DB ─────────────────────────────────────────────────────
+    const loadOrder = useCallback(async () => {
+        if (!orderNumber || !email) {
+            setError('Order details are missing. Please check your email for your order confirmation.');
+            setLoading(false);
+            return;
+        }
         try {
             const data = await storeApi.getOrder(orderNumber, email);
             setOrder(data);
         } catch {
-            setError('Could not load order. Please check your email for order details.');
+            setError('Could not load your order. Please check your email for details, or use Track Order.');
         }
         setLoading(false);
-    };
+    }, [orderNumber, email]);
 
-    const verifyPayment = async () => {
-        if (!paystackRef || !orderNumber) return;
+    // ── Verify payment with Paystack ───────────────────────────────────────────
+    const verifyPayment = useCallback(async () => {
+        if (!referenceToVerify) return;
         setVerifying(true);
+        setVerifyMsg('');
         try {
-            const result = await storeApi.verifyPayment(paystackRef);
-            if (result.success) await loadOrder();
+            const result = await storeApi.verifyPayment(referenceToVerify);
+            if (result.success) {
+                // Payment confirmed — reload order to show updated status
+                await loadOrder();
+            } else {
+                // Verify returned but payment not successful yet
+                setVerifyMsg(result.message || 'Payment not confirmed yet. Please wait a moment and try again.');
+                await loadOrder(); // Still reload to show latest DB status
+            }
         } catch {
-            // Ignore verify errors — show current status from DB
+            setVerifyMsg('Could not reach payment gateway. Please try refreshing.');
+            await loadOrder(); // Still show order even if verify fails
         }
         setVerifying(false);
-    };
+    }, [referenceToVerify, loadOrder]);
 
+    // ── On mount: decide whether to verify first or just load ─────────────────
     useEffect(() => {
         const init = async () => {
-            if (paystackRef && !paymentPending) {
+            if (referenceToVerify && !paymentPending) {
+                // Coming back from Paystack — verify payment then load
+                setVerifying(true);
+                setLoading(false);
                 await verifyPayment();
             } else {
+                // Direct visit or paymentPending=true — just load
                 await loadOrder();
             }
         };
         init();
-    }, [orderNumber]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    /* ── Loading / error states ─────────────────────────────────────────── */
+    /* ── Loading state ──────────────────────────────────────────────────────── */
     if (loading || verifying) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 pt-24">
-                <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 pt-24">
+                <div className="w-14 h-14 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
                 <p className="text-sm text-gray-500 font-medium">
-                    {verifying ? 'Verifying your payment…' : 'Loading your order…'}
+                    {verifying ? 'Confirming your payment with Paystack…' : 'Loading your order…'}
+                </p>
+                <p className="text-xs text-gray-400 max-w-xs text-center">
+                    {verifying ? 'This usually takes a few seconds. Please don\'t close this page.' : ''}
                 </p>
             </div>
         );
     }
 
+    /* ── Error state ────────────────────────────────────────────────────────── */
     if (error || !order) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center pt-24">
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-5 px-4 text-center pt-24">
                 <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
                     <FiXCircle size={36} className="text-red-400" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-800">Order Not Found</h2>
-                <p className="text-gray-500 text-sm max-w-md leading-relaxed">
-                    {error || 'We could not find this order. Please check your email for details.'}
-                </p>
-                <Link
-                    to="/store"
-                    className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-colors text-sm"
-                >
-                    Back to Store
-                </Link>
+                <div>
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">Order Not Found</h2>
+                    <p className="text-gray-500 text-sm max-w-md leading-relaxed">
+                        {error || 'We could not find this order. Please check your email for your order details.'}
+                    </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <Link to="/track-order" className="bg-red-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-red-700 transition-colors text-sm">
+                        Track My Order
+                    </Link>
+                    <Link to="/store" className="border border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-300 transition-colors text-sm">
+                        Back to Store
+                    </Link>
+                </div>
             </div>
         );
     }
 
-    const statusInfo      = ORDER_STATUS_LABELS[order.orderStatus]  || ORDER_STATUS_LABELS.PENDING;
-    const paymentInfo     = PAYMENT_STATUS_LABELS[order.paymentStatus] || PAYMENT_STATUS_LABELS.PENDING;
-    const StatusIcon      = statusInfo.icon;
-    const currentStepIdx  = ORDER_STATUS_STEPS.indexOf(order.orderStatus);
-    const isPaid          = order.paymentStatus === 'PAID';
+    const statusInfo     = ORDER_STATUS_LABELS[order.orderStatus]    || ORDER_STATUS_LABELS.PENDING;
+    const paymentInfo    = PAYMENT_STATUS_LABELS[order.paymentStatus] || PAYMENT_STATUS_LABELS.PENDING;
+    const StatusIcon     = statusInfo.icon;
+    const currentStepIdx = ORDER_STATUS_STEPS.indexOf(order.orderStatus);
+    const isPaid         = order.paymentStatus === 'PAID';
+    const isFailed       = order.paymentStatus === 'FAILED';
+    const canRefresh     = order.paymentStatus === 'PENDING' && !!referenceToVerify;
 
     return (
         <>
-            <SEO title={`Order ${order.orderNumber} | Kays Drive`} description="Your order details" />
+            <SEO title={`Order ${order.orderNumber} | Kays Drive`} description="Your order confirmation" />
 
-            {/* ── Page wrapper — accounts for fixed navbar ─────────────────── */}
             <div className="min-h-screen bg-gray-50 pt-24 pb-16">
                 <div className="max-w-2xl mx-auto px-4 sm:px-6">
 
@@ -132,19 +171,21 @@ export const OrderConfirmationPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center mb-8"
                     >
-                        {/* Status icon circle */}
                         <div className={`w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center shadow-sm
-                            ${isPaid ? 'bg-green-100' : order.paymentStatus === 'FAILED' ? 'bg-red-100' : 'bg-yellow-50'}`}>
+                            ${isPaid ? 'bg-green-100' : isFailed ? 'bg-red-100' : 'bg-yellow-50'}`}
+                        >
                             <StatusIcon size={34} className={statusInfo.color} />
                         </div>
 
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">
-                            {isPaid ? '🎉 Order Confirmed!' : 'Order Received'}
+                            {isPaid ? '🎉 Order Confirmed!' : isFailed ? 'Payment Failed' : 'Order Received'}
                         </h1>
                         <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
                             {isPaid
                                 ? 'Thank you! Your payment was successful and your order is confirmed.'
-                                : 'We\'ve received your order. Complete your payment to confirm it.'}
+                                : isFailed
+                                    ? 'Your payment was not completed. Please try again or contact support.'
+                                    : 'We\'ve received your order. Your payment is being confirmed.'}
                         </p>
                     </motion.div>
 
@@ -160,8 +201,8 @@ export const OrderConfirmationPage = () => {
                             {paymentInfo.label}
                         </span>
 
-                        {/* Refresh button — shown when PENDING and we have a ref */}
-                        {order.paymentStatus === 'PENDING' && paystackRef && (
+                        {/* Refresh / re-verify button */}
+                        {canRefresh && (
                             <button
                                 onClick={verifyPayment}
                                 disabled={verifying}
@@ -172,11 +213,36 @@ export const OrderConfirmationPage = () => {
                             </button>
                         )}
 
-                        {/* Show "paid" checkmark */}
-                        {isPaid && (
-                            <FiCheckCircle size={16} className="ml-auto text-green-600" />
-                        )}
+                        {isPaid && <FiCheckCircle size={16} className="ml-auto text-green-600 flex-shrink-0" />}
+                        {isFailed && <FiAlertCircle size={16} className="ml-auto text-red-500 flex-shrink-0" />}
                     </motion.div>
+
+                    {/* Verify message (soft errors / still pending) */}
+                    {verifyMsg && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 text-sm text-amber-700 flex items-start gap-2"
+                        >
+                            <FiAlertCircle size={15} className="mt-0.5 flex-shrink-0" />
+                            {verifyMsg}
+                        </motion.div>
+                    )}
+
+                    {/* Failed — retry prompt */}
+                    {isFailed && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 mb-5 text-sm text-red-700"
+                        >
+                            <p className="font-semibold mb-1">What happened?</p>
+                            <p className="text-red-600 leading-relaxed">Your payment was declined or abandoned. Your order is saved — please contact us to retry or place a new order.</p>
+                            <Link to="/contact" className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-red-700 underline underline-offset-2">
+                                Contact Support
+                            </Link>
+                        </motion.div>
+                    )}
 
                     {/* ── Order meta card ─────────────────────────────────────── */}
                     <motion.div
@@ -185,7 +251,7 @@ export const OrderConfirmationPage = () => {
                         transition={{ delay: 0.1 }}
                         className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4"
                     >
-                        {/* Order summary header row */}
+                        {/* Summary row */}
                         <div className="px-6 py-5 border-b border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div>
                                 <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Order #</p>
@@ -205,22 +271,15 @@ export const OrderConfirmationPage = () => {
                             </div>
                         </div>
 
-                        {/* Items ordered */}
+                        {/* Items */}
                         <div className="px-6 py-5 border-b border-gray-100">
-                            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-4">
-                                Items Ordered
-                            </h3>
+                            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-4">Items Ordered</h3>
                             <div className="space-y-4">
                                 {order.items.map((item) => (
                                     <div key={item.id} className="flex items-center gap-4">
-                                        {/* Product image — bigger for readability */}
                                         <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100">
                                             {item.productImage ? (
-                                                <img
-                                                    src={item.productImage}
-                                                    alt={item.productName}
-                                                    className="w-full h-full object-cover"
-                                                />
+                                                <img src={item.productImage} alt={item.productName} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
                                                     <FiPackage size={20} className="text-gray-300" />
@@ -228,37 +287,27 @@ export const OrderConfirmationPage = () => {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-semibold text-gray-900 leading-snug">
-                                                {item.productName}
-                                            </p>
-                                            <p className="text-xs text-gray-400 mt-0.5">
-                                                Qty: {item.quantity} × {formatPrice(item.price)}
-                                            </p>
+                                            <p className="text-sm font-semibold text-gray-900 leading-snug">{item.productName}</p>
+                                            <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity} × {formatPrice(item.price)}</p>
                                         </div>
-                                        <span className="text-sm font-bold text-gray-900 flex-shrink-0">
-                                            {formatPrice(item.subtotal)}
-                                        </span>
+                                        <span className="text-sm font-bold text-gray-900 flex-shrink-0">{formatPrice(item.subtotal)}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Total row — label changes depending on payment status */}
+                            {/* Total row */}
                             <div className="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                <span className="font-bold text-gray-900">
-                                    {isPaid ? 'Total Paid' : 'Order Total'}
-                                </span>
+                                <span className="font-bold text-gray-900">{isPaid ? 'Total Paid' : 'Order Total'}</span>
                                 <span className={`text-lg font-extrabold ${isPaid ? 'text-green-600' : 'text-red-600'}`}>
                                     {formatPrice(order.total)}
                                 </span>
                             </div>
                         </div>
 
-                        {/* ── Order Progress timeline ──────────────────────────── */}
+                        {/* ── Progress timeline ───────────────────────────────── */}
                         {order.orderStatus !== 'CANCELLED' && (
                             <div className="px-6 py-5">
-                                <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-5">
-                                    Order Progress
-                                </h3>
+                                <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-5">Order Progress</h3>
                                 <div className="flex items-start">
                                     {ORDER_STATUS_STEPS.map((step, i) => {
                                         const isCompleted = i <= currentStepIdx;
@@ -274,14 +323,10 @@ export const OrderConfirmationPage = () => {
                                                 )}
                                                 {/* Dot */}
                                                 <div className={`relative z-10 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                                                    ${isCompleted
-                                                        ? 'bg-red-600 border-red-600'
-                                                        : 'bg-white border-gray-300'}
+                                                    ${isCompleted ? 'bg-red-600 border-red-600' : 'bg-white border-gray-300'}
                                                     ${isCurrent ? 'ring-4 ring-red-100' : ''}`}
                                                 >
-                                                    {isCompleted && (
-                                                        <div className="w-2 h-2 rounded-full bg-white" />
-                                                    )}
+                                                    {isCompleted && <div className="w-2 h-2 rounded-full bg-white" />}
                                                 </div>
                                                 {/* Label */}
                                                 <span className={`text-[10px] font-semibold text-center leading-tight px-0.5
@@ -297,16 +342,14 @@ export const OrderConfirmationPage = () => {
                         )}
                     </motion.div>
 
-                    {/* ── Customer details card ───────────────────────────────── */}
+                    {/* ── Customer details ────────────────────────────────────── */}
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.15 }}
                         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6"
                     >
-                        <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-4">
-                            Your Details
-                        </h3>
+                        <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-4">Your Details</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
                                 <p className="text-xs text-gray-400 mb-0.5">Name</p>
@@ -331,7 +374,7 @@ export const OrderConfirmationPage = () => {
                             {order.notes && (
                                 <div className="sm:col-span-2">
                                     <p className="text-xs text-gray-400 mb-0.5">Notes</p>
-                                    <p className="text-gray-600 italic text-sm">{order.notes}</p>
+                                    <p className="text-gray-600 italic">{order.notes}</p>
                                 </div>
                             )}
                         </div>
