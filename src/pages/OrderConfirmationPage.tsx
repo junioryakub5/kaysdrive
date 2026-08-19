@@ -383,24 +383,24 @@ export const OrderConfirmationPage = () => {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="flex flex-col sm:flex-row gap-3"
+                        className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto w-full"
                     >
                         <Link
                             to="/store"
-                            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-colors text-center flex items-center justify-center gap-2 shadow-lg shadow-red-100"
+                            className="bg-red-600 hover:bg-red-700 text-white px-5 py-3.5 rounded-xl font-semibold text-sm transition-colors text-center flex items-center justify-center gap-2"
                         >
                             <FiShoppingBag size={15} />
                             Continue Shopping
                         </Link>
                         <Link
                             to="/track-order"
-                            className="flex-1 border-2 border-gray-200 hover:border-red-300 text-gray-700 hover:text-red-600 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors text-center"
+                            className="border border-gray-200 hover:border-red-300 text-gray-700 hover:text-red-600 px-5 py-3.5 rounded-xl font-semibold text-sm transition-colors text-center"
                         >
                             Track This Order
                         </Link>
                         <Link
                             to="/contact"
-                            className="flex-1 border-2 border-gray-200 hover:border-gray-300 text-gray-600 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors text-center"
+                            className="border border-gray-200 hover:border-gray-300 text-gray-600 px-5 py-3.5 rounded-xl font-semibold text-sm transition-colors text-center"
                         >
                             Need Help?
                         </Link>
