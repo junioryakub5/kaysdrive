@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { SiPorsche, SiBmw, SiAudi, SiMercedes, SiToyota, SiVolkswagen } from 'react-icons/si';
+import { SiPorsche, SiBmw, SiAudi, SiToyota, SiVolkswagen } from 'react-icons/si';
+import { TbBrandMercedes } from 'react-icons/tb';
 import { brandsApi } from '../../services/api';
 import type { Brand } from '../../types';
 
@@ -20,8 +21,8 @@ export function BrandsSection() {
             'porsche': <SiPorsche className="w-full h-full" />,
             'bmw': <SiBmw className="w-full h-full" />,
             'audi': <SiAudi className="w-full h-full" />,
-            'mercedes-benz': <SiMercedes className="w-full h-full" />,
-            'mercedes': <SiMercedes className="w-full h-full" />,
+            'mercedes-benz': <TbBrandMercedes className="w-full h-full" />,
+            'mercedes': <TbBrandMercedes className="w-full h-full" />,
             'toyota': <SiToyota className="w-full h-full" />,
             'volkswagen': <SiVolkswagen className="w-full h-full" />,
         };
