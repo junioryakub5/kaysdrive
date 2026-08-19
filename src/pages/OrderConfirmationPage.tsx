@@ -169,8 +169,38 @@ export const OrderConfirmationPage = () => {
         const light = '#999999';
         const leftM = 20;
         const rightM = w - 20;
+        const midX = w / 2;
 
-        // ── Header ──
+        // Helper: section label
+        const sectionLabel = (label: string) => {
+            y += 10;
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(light);
+            doc.text(label, leftM, y);
+            y += 2;
+            doc.setDrawColor('#e5e7eb');
+            doc.setLineWidth(0.3);
+            doc.line(leftM, y, rightM, y);
+            y += 5;
+        };
+
+        // Helper: detail row (label + value)
+        const detailRow = (label: string, value: string, x1 = leftM, x2 = midX - 5) => {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(light);
+            doc.text(label, x1, y);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(dark);
+            doc.text(value, x2, y);
+            y += 6;
+        };
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // HEADER
+        // ═══════════════════════════════════════════════════════════════════════
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(dark);
@@ -185,7 +215,7 @@ export const OrderConfirmationPage = () => {
         doc.text('KAYS DRIVE 25 ENTERPRISE', leftM, y + 5);
         doc.text('Kumasi, Ghana', leftM, y + 9);
 
-        // Right side - RECEIPT title
+        // Right — RECEIPT title
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(dark);
@@ -195,10 +225,10 @@ export const OrderConfirmationPage = () => {
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(gray);
         doc.text(`#${order.orderNumber}`, rightM, y + 6, { align: 'right' });
-
         doc.setFont('helvetica', 'normal');
         doc.text(formatDate(order.createdAt), rightM, y + 11, { align: 'right' });
 
+        // Payment badge
         doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
         if (isPaid) {
@@ -209,68 +239,110 @@ export const OrderConfirmationPage = () => {
             doc.text(order.paymentStatus, rightM, y + 17, { align: 'right' });
         }
 
-        // Red line
+        // Red separator
         y += 24;
         doc.setDrawColor(red);
         doc.setLineWidth(0.6);
         doc.line(leftM, y, rightM, y);
 
-        // ── Bill To ──
-        y += 10;
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(light);
-        doc.text('BILL TO', leftM, y);
+        // ═══════════════════════════════════════════════════════════════════════
+        // ORDER INFO
+        // ═══════════════════════════════════════════════════════════════════════
+        sectionLabel('ORDER DETAILS');
 
-        y += 6;
-        doc.setFontSize(11);
+        // Two columns: left and right
+        const col2X = midX + 10;
+        const col2ValX = midX + 45;
+
+        // Row 1
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(light);
+        doc.text('Order Number', leftM, y);
+        doc.text('Date', col2X, y);
+        y += 4;
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(dark);
-        doc.text(order.customerName, leftM, y);
-
-        y += 5;
-        doc.setFontSize(9);
+        doc.text(order.orderNumber, leftM, y);
         doc.setFont('helvetica', 'normal');
-        doc.setTextColor(gray);
-        doc.text(order.customerEmail, leftM, y);
+        doc.text(formatDate(order.createdAt), col2X, y);
+        y += 7;
 
+        // Row 2
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(light);
+        doc.text('Order Status', leftM, y);
+        doc.text('Payment Status', col2X, y);
+        y += 4;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(statusInfo.color === 'text-green-600' ? '#16a34a' : statusInfo.color === 'text-blue-600' ? '#2563eb' : statusInfo.color === 'text-red-600' ? '#dc2626' : '#ca8a04');
+        doc.text(statusInfo.label, leftM, y);
+        doc.setTextColor(isPaid ? '#15803d' : isFailed ? '#dc2626' : '#ca8a04');
+        doc.text(isPaid ? 'Paid' : isFailed ? 'Failed' : 'Pending', col2X, y);
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // CUSTOMER DETAILS
+        // ═══════════════════════════════════════════════════════════════════════
+        sectionLabel('CUSTOMER DETAILS');
+
+        detailRow('Name', order.customerName);
+        detailRow('Email', order.customerEmail);
         if (order.customerPhone) {
-            y += 4.5;
-            doc.text(order.customerPhone, leftM, y);
+            detailRow('Phone', order.customerPhone);
         }
         if (order.deliveryAddress) {
-            y += 4.5;
-            doc.text(order.deliveryAddress, leftM, y);
+            detailRow('Delivery Address', order.deliveryAddress);
+        }
+        if (order.region || order.city) {
+            const location = [order.city, order.region].filter(Boolean).join(', ');
+            detailRow('Location', location);
+        }
+        if (order.notes) {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(light);
+            doc.text('Notes', leftM, y);
+            y += 4;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'italic');
+            doc.setTextColor(gray);
+            // Wrap long notes
+            const noteLines = doc.splitTextToSize(order.notes, rightM - leftM);
+            doc.text(noteLines, leftM, y);
+            y += noteLines.length * 4 + 2;
         }
 
-        // ── Items Table ──
-        y += 12;
-        doc.setDrawColor('#e5e7eb');
-        doc.setLineWidth(0.4);
-        doc.line(leftM, y, rightM, y);
+        // ═══════════════════════════════════════════════════════════════════════
+        // ITEMS TABLE
+        // ═══════════════════════════════════════════════════════════════════════
+        sectionLabel('ITEMS ORDERED');
 
-        y += 6;
+        // Table header
         doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(light);
         doc.text('PRODUCT', leftM, y);
-        doc.text('QTY', w / 2 + 15, y, { align: 'center' });
-        doc.text('PRICE', w / 2 + 40, y, { align: 'right' });
+        doc.text('QTY', midX + 15, y, { align: 'center' });
+        doc.text('PRICE', midX + 40, y, { align: 'right' });
         doc.text('TOTAL', rightM, y, { align: 'right' });
 
         y += 3;
         doc.setDrawColor('#e5e7eb');
+        doc.setLineWidth(0.3);
         doc.line(leftM, y, rightM, y);
 
-        // Items
+        // Item rows
         order.items.forEach(item => {
             y += 7;
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(dark);
 
-            // Truncate long names
-            const maxNameW = w / 2 - 5;
+            // Truncate long product names
+            const maxNameW = midX - 5;
             let name = item.productName;
             while (doc.getTextWidth(name) > maxNameW && name.length > 10) {
                 name = name.slice(0, -4) + '...';
@@ -278,8 +350,8 @@ export const OrderConfirmationPage = () => {
             doc.text(name, leftM, y);
 
             doc.setTextColor(gray);
-            doc.text(String(item.quantity), w / 2 + 15, y, { align: 'center' });
-            doc.text(formatPrice(item.price), w / 2 + 40, y, { align: 'right' });
+            doc.text(String(item.quantity), midX + 15, y, { align: 'center' });
+            doc.text(formatPrice(item.price), midX + 40, y, { align: 'right' });
 
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(dark);
@@ -291,8 +363,10 @@ export const OrderConfirmationPage = () => {
             doc.line(leftM, y, rightM, y);
         });
 
-        // ── Totals ──
-        const totalsX = w / 2 + 20;
+        // ═══════════════════════════════════════════════════════════════════════
+        // TOTALS
+        // ═══════════════════════════════════════════════════════════════════════
+        const totalsX = midX + 20;
         y += 10;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
@@ -311,7 +385,7 @@ export const OrderConfirmationPage = () => {
         doc.setTextColor(gray);
         doc.text('Delivery', totalsX, y);
         doc.setFont('helvetica', 'italic');
-        doc.text('Arranged', rightM, y, { align: 'right' });
+        doc.text('Arranged on order', rightM, y, { align: 'right' });
 
         y += 4;
         doc.setDrawColor(dark);
@@ -322,10 +396,12 @@ export const OrderConfirmationPage = () => {
         doc.setFontSize(13);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(dark);
-        doc.text('Total', totalsX, y);
+        doc.text(isPaid ? 'Total Paid' : 'Total', totalsX, y);
         doc.text(formatPrice(order.total), rightM, y, { align: 'right' });
 
-        // ── Footer ──
+        // ═══════════════════════════════════════════════════════════════════════
+        // FOOTER
+        // ═══════════════════════════════════════════════════════════════════════
         y += 25;
         doc.setDrawColor('#e5e7eb');
         doc.setLineWidth(0.3);
@@ -335,10 +411,10 @@ export const OrderConfirmationPage = () => {
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(light);
-        doc.text('Thank you for shopping with Kays Drive!', w / 2, y, { align: 'center' });
+        doc.text('Thank you for shopping with Kays Drive!', midX, y, { align: 'center' });
         y += 5;
         doc.setTextColor('#cccccc');
-        doc.text('www.kaysdrive.com', w / 2, y, { align: 'center' });
+        doc.text('www.kaysdrive.com  |  Kumasi, Ghana', midX, y, { align: 'center' });
 
         // Save
         doc.save(`KaysDrive-Receipt-${order.orderNumber}.pdf`);
