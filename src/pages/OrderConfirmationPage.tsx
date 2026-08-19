@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import { storeApi } from '../services/storeApi';
 import type { Order } from '../types';
+import { useCart } from '../contexts/CartContext';
 import { SEO } from '../components/SEO/SEO';
 import { formatPrice, formatDate } from '../utils/format';
 
@@ -32,6 +33,7 @@ const PAYMENT_STATUS_LABELS: Record<string, { label: string; color: string; bg: 
 export const OrderConfirmationPage = () => {
     const { orderNumber } = useParams<{ orderNumber: string }>();
     const [searchParams] = useSearchParams();
+    const { clearCart } = useCart();
 
     // Our params (set in callback_url during checkout)
     const email          = searchParams.get('email') || '';
@@ -74,7 +76,8 @@ export const OrderConfirmationPage = () => {
         try {
             const result = await storeApi.verifyPayment(referenceToVerify);
             if (result.success) {
-                // Payment confirmed — reload order to show updated status
+                // Payment confirmed — clear cart and reload order
+                clearCart();
                 await loadOrder();
             } else {
                 // Verify returned but payment not successful yet
@@ -86,7 +89,7 @@ export const OrderConfirmationPage = () => {
             await loadOrder(); // Still show order even if verify fails
         }
         setVerifying(false);
-    }, [referenceToVerify, loadOrder]);
+    }, [referenceToVerify, loadOrder, clearCart]);
 
     // ── On mount: decide whether to verify first or just load ─────────────────
     useEffect(() => {

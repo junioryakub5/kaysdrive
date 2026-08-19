@@ -82,12 +82,12 @@ export const CheckoutPage = () => {
             if (result.success) {
                 if (result.paymentUrl) {
                     // ✅ Paystack URL received — redirect to payment page
+                    // Don't clear cart yet — it will be cleared after payment verification
                     sessionStorage.setItem('pending_order', JSON.stringify({
                         orderNumber: result.orderNumber,
                         email: form.customerEmail,
                         paystackRef: result.paystackRef,
                     }));
-                    clearCart();
                     window.location.href = result.paymentUrl;
                 } else if ((result as any).paymentError) {
                     // ⚠️ Order created but Paystack init failed — show error, keep cart intact
