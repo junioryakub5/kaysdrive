@@ -3,7 +3,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     FiCheckCircle, FiClock, FiXCircle, FiPackage,
-    FiArrowRight, FiRefreshCw, FiShoppingBag, FiAlertCircle,
+    FiArrowRight, FiRefreshCw, FiShoppingBag, FiAlertCircle, FiDownload,
 } from 'react-icons/fi';
 import { storeApi } from '../services/storeApi';
 import type { Order } from '../types';
@@ -155,6 +155,102 @@ export const OrderConfirmationPage = () => {
     const isPaid         = order.paymentStatus === 'PAID';
     const isFailed       = order.paymentStatus === 'FAILED';
     const canRefresh     = order.paymentStatus === 'PENDING' && !!referenceToVerify;
+
+    // ── Receipt generator ──────────────────────────────────────────────────────
+    const downloadReceipt = () => {
+        const receiptWindow = window.open('', '_blank');
+        if (!receiptWindow) return;
+
+        const itemRows = order.items.map(item => `
+            <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:13px;color:#333;">${item.productName}</td>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;text-align:center;font-size:13px;color:#666;">${item.quantity}</td>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;text-align:right;font-size:13px;color:#666;">${formatPrice(item.price)}</td>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0f0;text-align:right;font-size:13px;font-weight:600;color:#333;">${formatPrice(item.subtotal)}</td>
+            </tr>
+        `).join('');
+
+        const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Receipt - ${order.orderNumber}</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:#333; background:#fff; padding:40px; max-width:700px; margin:0 auto; }
+    @media print { body { padding:20px; } .no-print { display:none !important; } }
+</style></head><body>
+
+<!-- Header -->
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid #dc2626;">
+    <div>
+        <h1 style="font-size:22px;font-weight:800;color:#111;letter-spacing:-0.5px;">KAY'S <span style="color:#dc2626;">DRIVE</span></h1>
+        <p style="font-size:11px;color:#999;margin-top:4px;">KAYS DRIVE 25 ENTERPRISE</p>
+        <p style="font-size:11px;color:#999;">Kumasi, Ghana</p>
+    </div>
+    <div style="text-align:right;">
+        <h2 style="font-size:18px;font-weight:700;color:#111;margin-bottom:6px;">RECEIPT</h2>
+        <p style="font-size:12px;color:#666;"><strong>#${order.orderNumber}</strong></p>
+        <p style="font-size:12px;color:#666;">${formatDate(order.createdAt)}</p>
+        <span style="display:inline-block;margin-top:8px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;${isPaid ? 'background:#dcfce7;color:#15803d;' : 'background:#fef9c3;color:#a16207;'}">
+            ${isPaid ? '✓ PAID' : order.paymentStatus}
+        </span>
+    </div>
+</div>
+
+<!-- Customer -->
+<div style="margin-bottom:30px;padding:16px 20px;background:#f9fafb;border-radius:8px;">
+    <h3 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:10px;">Bill To</h3>
+    <p style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">${order.customerName}</p>
+    <p style="font-size:12px;color:#666;">${order.customerEmail}</p>
+    ${order.customerPhone ? `<p style="font-size:12px;color:#666;">${order.customerPhone}</p>` : ''}
+    ${order.deliveryAddress ? `<p style="font-size:12px;color:#666;margin-top:4px;">${order.deliveryAddress}</p>` : ''}
+</div>
+
+<!-- Items -->
+<table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+    <thead>
+        <tr style="border-bottom:2px solid #e5e7eb;">
+            <th style="padding:8px 0;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Product</th>
+            <th style="padding:8px 0;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Qty</th>
+            <th style="padding:8px 0;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Price</th>
+            <th style="padding:8px 0;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#999;">Total</th>
+        </tr>
+    </thead>
+    <tbody>${itemRows}</tbody>
+</table>
+
+<!-- Totals -->
+<div style="margin-left:auto;width:220px;">
+    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
+        <span>Subtotal</span><span>${formatPrice(order.subtotal)}</span>
+    </div>
+    ${order.discount > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#16a34a;">
+        <span>Discount</span><span>-${formatPrice(order.discount)}</span>
+    </div>` : ''}
+    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666;">
+        <span>Delivery</span><span style="font-style:italic;color:#999;">Arranged</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:12px 0 0;margin-top:8px;border-top:2px solid #111;font-size:16px;font-weight:700;color:#111;">
+        <span>Total</span><span>${formatPrice(order.total)}</span>
+    </div>
+</div>
+
+<!-- Footer -->
+<div style="margin-top:50px;padding-top:20px;border-top:1px solid #e5e7eb;text-align:center;">
+    <p style="font-size:11px;color:#999;">Thank you for shopping with Kays Drive!</p>
+    <p style="font-size:11px;color:#bbb;margin-top:4px;">www.kaysdrive.com</p>
+</div>
+
+<!-- Print button -->
+<div class="no-print" style="text-align:center;margin-top:30px;">
+    <button onclick="window.print()" style="background:#dc2626;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">
+        Print / Save as PDF
+    </button>
+</div>
+
+</body></html>`;
+
+        receiptWindow.document.write(html);
+        receiptWindow.document.close();
+    };
 
     return (
         <>
@@ -383,7 +479,7 @@ export const OrderConfirmationPage = () => {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto w-full"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
                     >
                         <Link
                             to="/store"
@@ -392,6 +488,13 @@ export const OrderConfirmationPage = () => {
                             <FiShoppingBag size={15} />
                             Continue Shopping
                         </Link>
+                        <button
+                            onClick={downloadReceipt}
+                            className="border border-gray-200 hover:border-red-300 text-gray-700 hover:text-red-600 px-5 py-3.5 rounded-xl font-semibold text-sm transition-colors text-center flex items-center justify-center gap-2"
+                        >
+                            <FiDownload size={15} />
+                            Download Receipt
+                        </button>
                         <Link
                             to="/track-order"
                             className="border border-gray-200 hover:border-red-300 text-gray-700 hover:text-red-600 px-5 py-3.5 rounded-xl font-semibold text-sm transition-colors text-center"
