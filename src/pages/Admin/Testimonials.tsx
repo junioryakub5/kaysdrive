@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import "../../components/Admin/AdminDashboard.css";
 import { adminApi as api, type Testimonial } from '../../services/adminApi';
 
 // Default user icon SVG

@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
+import { authMiddleware } from '../middleware/auth.js';
+import { agentAuthMiddleware } from '../middleware/agentAuth.js';
 
 const uploadRouter = express.Router();
 
@@ -29,7 +31,7 @@ const upload = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: 100 * 1024 * 1024, // 100MB limit
+        fileSize: 10 * 1024 * 1024, // 10MB limit (was 100MB — unreasonable for images)
     },
 });
 
@@ -55,8 +57,23 @@ const uploadToCloudinary = (buffer: Buffer, folder: string): Promise<string> => 
     });
 };
 
-// Upload single image (cars)
-uploadRouter.post('/single', upload.single('image'), async (req: Request, res: Response) => {
+// Combined auth middleware: accepts either admin or agent tokens
+const adminOrAgentAuth = async (req: Request, res: Response, next: NextFunction) => {
+    // Try admin auth first
+    try {
+        await authMiddleware(req as any, res, (err?: any) => {
+            if (!err) return next();
+            // If admin auth failed, try agent auth
+            agentAuthMiddleware(req as any, res, next);
+        });
+    } catch {
+        // If admin auth threw, try agent auth
+        agentAuthMiddleware(req as any, res, next);
+    }
+};
+
+// Upload single image (cars) — requires admin or agent auth
+uploadRouter.post('/single', adminOrAgentAuth, upload.single('image'), async (req: Request, res: Response) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
@@ -70,8 +87,8 @@ uploadRouter.post('/single', upload.single('image'), async (req: Request, res: R
     }
 });
 
-// Upload multiple images for cars (max 10)
-uploadRouter.post('/multiple', upload.array('images', 10), async (req: Request, res: Response) => {
+// Upload multiple images for cars (max 10) — requires admin or agent auth
+uploadRouter.post('/multiple', adminOrAgentAuth, upload.array('images', 10), async (req: Request, res: Response) => {
     try {
         if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
             return res.status(400).json({ error: 'No files uploaded' });
@@ -88,8 +105,8 @@ uploadRouter.post('/multiple', upload.array('images', 10), async (req: Request, 
     }
 });
 
-// Upload multiple images for products (max 10)
-uploadRouter.post('/products/multiple', upload.array('images', 10), async (req: Request, res: Response) => {
+// Upload multiple images for products (max 10) — requires admin auth
+uploadRouter.post('/products/multiple', adminOrAgentAuth, upload.array('images', 10), async (req: Request, res: Response) => {
     try {
         if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
             return res.status(400).json({ error: 'No files uploaded' });
@@ -106,8 +123,8 @@ uploadRouter.post('/products/multiple', upload.array('images', 10), async (req: 
     }
 });
 
-// Upload single product image
-uploadRouter.post('/products/single', upload.single('image'), async (req: Request, res: Response) => {
+// Upload single product image — requires admin auth
+uploadRouter.post('/products/single', adminOrAgentAuth, upload.single('image'), async (req: Request, res: Response) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
@@ -125,7 +142,7 @@ uploadRouter.post('/products/single', upload.single('image'), async (req: Reques
 uploadRouter.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof multer.MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
-            return res.status(400).json({ error: 'File size is too large. Maximum size is 100MB.' });
+            return res.status(400).json({ error: 'File size is too large. Maximum size is 10MB.' });
         }
         return res.status(400).json({ error: err.message });
     }

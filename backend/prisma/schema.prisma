@@ -126,7 +126,7 @@ model ContactSubmission {
 
 model SiteSettings {
   id       String @id @default("default")
-  siteName String @default("Carz")
+  siteName String @default("Kays Drive")
   phone    String @default("")
   email    String @default("")
   address  String @default("")

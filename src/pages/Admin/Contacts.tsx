@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import "../../components/Admin/AdminDashboard.css";
 import { adminApi as api, type ContactSubmission } from '../../services/adminApi';
 
 export default function Contacts() {

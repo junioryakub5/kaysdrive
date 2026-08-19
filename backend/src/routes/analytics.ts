@@ -1,12 +1,15 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../utils/prisma.js';
 import crypto from 'crypto';
+import { authMiddleware, type AuthRequest } from '../middleware/auth.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
-// Helper function to hash IP address for privacy
+// Hash IP for privacy — salt from env variable
 function hashIP(ip: string): string {
-    return crypto.createHash('sha256').update(ip + 'salt-secret-key').digest('hex');
+    const salt = process.env.ANALYTICS_SALT || 'kaysdrive-analytics-salt';
+    return crypto.createHash('sha256').update(ip + salt).digest('hex');
 }
 
 // Helper to get client IP
@@ -17,8 +20,8 @@ function getClientIP(req: Request): string {
         'unknown';
 }
 
-// PUBLIC: Track page view
-router.post('/track', async (req: Request, res: Response) => {
+// PUBLIC: Track page view (rate-limited)
+router.post('/track', apiLimiter, async (req: Request, res: Response) => {
     try {
         const { page, referrer } = req.body;
 
@@ -46,8 +49,8 @@ router.post('/track', async (req: Request, res: Response) => {
     }
 });
 
-// ADMIN: Get analytics stats
-router.get('/stats', async (req: Request, res: Response) => {
+// ADMIN ONLY: Get analytics stats
+router.get('/stats', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -104,8 +107,7 @@ router.get('/stats', async (req: Request, res: Response) => {
             popularPages,
         });
     } catch (error) {
-        console.error('Error fetching analytics stats:', error);
-        res.status(500).json({ error: 'Failed to fetch analytics' });
+        next(error);
     }
 });
 

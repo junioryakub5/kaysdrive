@@ -13,9 +13,7 @@ import { storeApi } from '../services/storeApi';
 import type { Product } from '../types';
 import { useCart } from '../contexts/CartContext';
 import { SEO } from '../components/SEO/SEO';
-
-const formatPrice = (price: number) =>
-    new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS', minimumFractionDigits: 2 }).format(price);
+import { formatPrice } from '../utils/format';
 
 export const ProductDetailPage = () => {
     const { id } = useParams<{ id: string }>();

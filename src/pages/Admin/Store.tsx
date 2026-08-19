@@ -3,6 +3,7 @@ import { adminStoreApi } from '../../services/adminApi';
 import { ImageUpload } from '../../components/Shared/ImageUpload';
 import { PageHeader, Modal, ConfirmDialog, SearchBar, StatusBadge, getStatusType } from '../../components/Dashboard/UI';
 import type { Product, ProductCategory } from '../../types';
+import { formatPrice } from '../../utils/format';
 
 const UPLOAD_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/upload/products/multiple`;
 
@@ -145,9 +146,6 @@ export default function AdminProducts() {
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         (p.sku || '').toLowerCase().includes(search.toLowerCase())
     );
-
-    const formatPrice = (n: number) =>
-        new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS' }).format(n);
 
     return (
         <div className="dashboard-page">

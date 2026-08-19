@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
 import { agentApi } from '../../services/adminApi';
-import '../../components/Admin/AdminDashboard.css';
 
 export default function Profile() {
     const [loading, setLoading] = useState(true);

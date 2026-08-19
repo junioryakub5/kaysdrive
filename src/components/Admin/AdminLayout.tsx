@@ -7,6 +7,7 @@ import { Sidebar } from '../Dashboard/Layout/Sidebar';
 import { Topbar } from '../Dashboard/Layout/Topbar';
 import '../../styles/dashboard.css';
 import '../Dashboard/Layout/DashboardLayout.css';
+import './AdminDashboard.css';
 
 export default function AdminLayout() {
     const { admin } = useAuth();

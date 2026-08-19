@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import "../../components/Admin/AdminDashboard.css";
 import { adminApi as api, type Service } from '../../services/adminApi';
 
 export default function Services() {

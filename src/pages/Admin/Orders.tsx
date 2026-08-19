@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { adminStoreApi } from '../../services/adminApi';
 import { PageHeader, Modal, SearchBar, StatusBadge } from '../../components/Dashboard/UI';
 import type { Order } from '../../types';
-
-const formatPrice = (n: number) =>
-    new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS' }).format(n);
+import { formatPrice } from '../../utils/format';
 
 const formatDate = (s: string) =>
     new Date(s).toLocaleDateString('en-GH', { day: 'numeric', month: 'short', year: 'numeric' });

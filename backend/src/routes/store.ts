@@ -7,14 +7,7 @@ import https from 'https';
 
 export const storeRouter = Router();
 
-// Helper to parse JSON arrays
-const parseJsonArray = (str: string): string[] => {
-    try {
-        return JSON.parse(str);
-    } catch {
-        return [];
-    }
-};
+import { parseJsonArray } from '../utils/json.js';
 
 // Helper to format a product for API response
 const formatProduct = (product: any) => ({

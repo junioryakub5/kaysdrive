@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma.js';
 import { config } from '../utils/config.js';
 import { agentAuthMiddleware, type AgentRequest } from '../middleware/agentAuth.js';
+import { AppError } from '../middleware/errorHandler.js';
+import type { Request, Response, NextFunction } from 'express';
 import { loginLimiter } from '../middleware/rateLimiter.js';
 
 export const agentRouter = Router();
@@ -15,45 +17,37 @@ const parseCarFields = (car: any) => ({
     features: JSON.parse(car.features || '[]'),
 });
 
-// Agent login
-agentRouter.post('/login', loginLimiter, async (req, res) => {
+// =============================================================================
+// AUTH
+// =============================================================================
+
+agentRouter.post('/login', loginLimiter, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log('Agent login attempt:', req.body.email);
         const { email, password } = req.body;
 
+        if (!email || !password) {
+            throw new AppError('Email and password are required', 400);
+        }
+
         const agent = await prisma.agent.findUnique({ where: { email } });
-        console.log('Agent found:', agent ? agent.email : 'not found');
 
         if (!agent || !agent.isActive) {
-            console.log('Agent not found or inactive');
-            return res.status(401).json({ error: 'Invalid credentials' });
+            throw new AppError('Invalid credentials', 401);
         }
 
-        // First-time login: if no password set, set it now
+        // Agents MUST have a password set by admin. Reject if none exists.
         if (!agent.password) {
-            console.log('First-time login, setting password');
-            const hashedPassword = await bcrypt.hash(password, 10);
-            await prisma.agent.update({
-                where: { id: agent.id },
-                data: { password: hashedPassword },
-            });
-            console.log('Password set successfully');
-        } else {
-            console.log('Verifying existing password');
-            // Verify password
-            const valid = await bcrypt.compare(password, agent.password);
-            if (!valid) {
-                console.log('Password verification failed');
-                return res.status(401).json({ error: 'Invalid credentials' });
-            }
-            console.log('Password verified');
+            throw new AppError('Account not yet activated. Please contact your administrator.', 401);
         }
 
-        console.log('Signing JWT token');
+        const valid = await bcrypt.compare(password, agent.password);
+        if (!valid) {
+            throw new AppError('Invalid credentials', 401);
+        }
+
         const token = jwt.sign({ agentId: agent.id, type: 'agent' }, config.jwtSecret as string, {
             expiresIn: '24h',
         } as jwt.SignOptions);
-        console.log('Token signed successfully');
 
         res.json({
             success: true,
@@ -67,33 +61,52 @@ agentRouter.post('/login', loginLimiter, async (req, res) => {
             },
         });
     } catch (error) {
-        console.error('Agent login error:', error);
-        res.status(500).json({ error: 'Server error' });
+        next(error);
     }
 });
 
-
-// Note: Agent auth middleware moved to ../middleware/agentAuth.ts
+// =============================================================================
+// PROFILE
+// =============================================================================
 
 // Get current agent
-agentRouter.get('/me', agentAuthMiddleware, async (req: AgentRequest, res) => {
+agentRouter.get('/me', agentAuthMiddleware, async (req: AgentRequest, res: Response) => {
     res.json({ agent: req.agent });
 });
 
 // Update current agent profile
-agentRouter.put('/me', agentAuthMiddleware, async (req: AgentRequest, res) => {
+agentRouter.put('/me', agentAuthMiddleware, async (req: AgentRequest, res: Response, next: NextFunction) => {
     try {
-        const { name, role, phone, avatar, bio, password } = req.body;
+        const { name, role, phone, avatar, bio, password, currentPassword } = req.body;
 
-        const updateData: any = {};
+        const updateData: Record<string, string> = {};
         if (name) updateData.name = name;
         if (role) updateData.role = role;
         if (phone) updateData.phone = phone;
         if (avatar !== undefined) updateData.avatar = avatar;
         if (bio !== undefined) updateData.bio = bio;
 
-        // Hash new password if provided
+        // Password change requires current password verification
         if (password) {
+            if (!currentPassword) {
+                throw new AppError('Current password is required to set a new password', 400);
+            }
+
+            // Fetch agent with password hash
+            const agentWithPw = await prisma.agent.findUnique({
+                where: { id: req.agent!.id },
+                select: { password: true },
+            });
+
+            if (!agentWithPw?.password) {
+                throw new AppError('Account not properly configured. Contact admin.', 400);
+            }
+
+            const isCurrentValid = await bcrypt.compare(currentPassword, agentWithPw.password);
+            if (!isCurrentValid) {
+                throw new AppError('Current password is incorrect', 401);
+            }
+
             updateData.password = await bcrypt.hash(password, 10);
         }
 
@@ -105,13 +118,16 @@ agentRouter.put('/me', agentAuthMiddleware, async (req: AgentRequest, res) => {
         const { password: _, ...agentWithoutPassword } = updatedAgent;
         res.json({ agent: agentWithoutPassword });
     } catch (error) {
-        console.error('Error updating agent profile:', error);
-        res.status(500).json({ error: 'Server error' });
+        next(error);
     }
 });
 
+// =============================================================================
+// AGENT CARS
+// =============================================================================
+
 // Get agent's cars
-agentRouter.get('/cars', agentAuthMiddleware, async (req: AgentRequest, res) => {
+agentRouter.get('/cars', agentAuthMiddleware, async (req: AgentRequest, res: Response, next: NextFunction) => {
     try {
         const cars = await prisma.car.findMany({
             where: { agentId: req.agent!.id },
@@ -119,13 +135,12 @@ agentRouter.get('/cars', agentAuthMiddleware, async (req: AgentRequest, res) => 
         });
         res.json(cars.map(parseCarFields));
     } catch (error) {
-        console.error('Error fetching agent cars:', error);
-        res.status(500).json({ error: 'Server error' });
+        next(error);
     }
 });
 
 // Get agent stats
-agentRouter.get('/stats', agentAuthMiddleware, async (req: AgentRequest, res) => {
+agentRouter.get('/stats', agentAuthMiddleware, async (req: AgentRequest, res: Response, next: NextFunction) => {
     try {
         const [totalCars, publishedCars, featuredCars] = await Promise.all([
             prisma.car.count({ where: { agentId: req.agent!.id } }),
@@ -134,15 +149,18 @@ agentRouter.get('/stats', agentAuthMiddleware, async (req: AgentRequest, res) =>
         ]);
         res.json({ totalCars, publishedCars, featuredCars });
     } catch (error) {
-        console.error('Error fetching agent stats:', error);
-        res.status(500).json({ error: 'Server error' });
+        next(error);
     }
 });
 
 // Create a new car
-agentRouter.post('/cars', agentAuthMiddleware, async (req: AgentRequest, res) => {
+agentRouter.post('/cars', agentAuthMiddleware, async (req: AgentRequest, res: Response, next: NextFunction) => {
     try {
         const { title, price, priceType, status, category, manufacturer, year, mileage, engine, fuel, transmission, city, images, features, description } = req.body;
+
+        if (!title || !price || !category || !manufacturer || !year || !description) {
+            throw new AppError('Missing required car fields', 400);
+        }
 
         // Generate slug
         const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -175,13 +193,12 @@ agentRouter.post('/cars', agentAuthMiddleware, async (req: AgentRequest, res) =>
 
         res.status(201).json(parseCarFields(car));
     } catch (error) {
-        console.error('Error creating car:', error);
-        res.status(500).json({ error: 'Server error' });
+        next(error);
     }
 });
 
 // Update agent's own car
-agentRouter.put('/cars/:id', agentAuthMiddleware, async (req: AgentRequest, res) => {
+agentRouter.put('/cars/:id', agentAuthMiddleware, async (req: AgentRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
 
@@ -191,7 +208,7 @@ agentRouter.put('/cars/:id', agentAuthMiddleware, async (req: AgentRequest, res)
         });
 
         if (!existingCar) {
-            return res.status(404).json({ error: 'Car not found or not yours' });
+            throw new AppError('Car not found or not yours', 404);
         }
 
         const { title, price, priceType, status, category, manufacturer, year, mileage, engine, fuel, transmission, city, images, features, description } = req.body;
@@ -219,13 +236,12 @@ agentRouter.put('/cars/:id', agentAuthMiddleware, async (req: AgentRequest, res)
 
         res.json(parseCarFields(car));
     } catch (error) {
-        console.error('Error updating car:', error);
-        res.status(500).json({ error: 'Server error' });
+        next(error);
     }
 });
 
 // Delete agent's own car
-agentRouter.delete('/cars/:id', agentAuthMiddleware, async (req: AgentRequest, res) => {
+agentRouter.delete('/cars/:id', agentAuthMiddleware, async (req: AgentRequest, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params;
 
@@ -235,13 +251,12 @@ agentRouter.delete('/cars/:id', agentAuthMiddleware, async (req: AgentRequest, r
         });
 
         if (!existingCar) {
-            return res.status(404).json({ error: 'Car not found or not yours' });
+            throw new AppError('Car not found or not yours', 404);
         }
 
         await prisma.car.delete({ where: { id } });
         res.json({ success: true });
     } catch (error) {
-        console.error('Error deleting car:', error);
-        res.status(500).json({ error: 'Server error' });
+        next(error);
     }
 });

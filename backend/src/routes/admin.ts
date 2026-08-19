@@ -10,17 +10,7 @@ import { loginLimiter } from '../middleware/rateLimiter.js';
 
 export const adminRouter = Router();
 
-// Helper to stringify JSON for SQLite
-const stringifyJson = (arr: any[]): string => JSON.stringify(arr);
-
-// Helper to parse JSON arrays from SQLite
-const parseJsonArray = (str: string): any[] => {
-    try {
-        return JSON.parse(str);
-    } catch {
-        return [];
-    }
-};
+import { parseJsonArray, stringifyJson } from '../utils/json.js';
 
 // =============================================================================
 // AUTH

@@ -96,7 +96,6 @@ export const CarCard = ({
                         onClick={(e) => {
                             e.preventDefault();
                             // TODO: Add to comparison logic
-                            console.log('Add to comparison:', title);
                         }}
                         className="absolute top-4 right-4 bg-white/90 p-2 rounded hover:bg-white transition-colors"
                     >

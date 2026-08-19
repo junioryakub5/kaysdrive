@@ -8,12 +8,7 @@ import {
 import { storeApi } from '../services/storeApi';
 import type { Order } from '../types';
 import { SEO } from '../components/SEO/SEO';
-
-const formatPrice = (price: number) =>
-    new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS', minimumFractionDigits: 2 }).format(price);
-
-const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric' });
+import { formatPrice, formatDate } from '../utils/format';
 
 const ORDER_STATUS_STEPS = ['PENDING', 'CONFIRMED', 'PROCESSING', 'READY', 'DISPATCHED', 'DELIVERED'];
 

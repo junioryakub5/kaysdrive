@@ -4,14 +4,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 export const publicRouter = Router();
 
-// Helper to parse JSON arrays from SQLite
-const parseJsonArray = (str: string): string[] => {
-    try {
-        return JSON.parse(str);
-    } catch {
-        return [];
-    }
-};
+import { parseJsonArray } from '../utils/json.js';
 
 // Helper to format car for API response
 const formatCar = (car: any) => ({
