@@ -186,122 +186,122 @@ async function main() {
 
     // ── OBD2 Car Diagnostic Scanner ───────────────────────────────────────────
     imageUrls['obd2-diagnostic-scanner'] = await uploadPair('obd2-diagnostic-scanner', [
-        'https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4489749/pexels-photo-4489749.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8986071/pexels-photo-8986071.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Professional Bluetooth OBD2 Scanner ──────────────────────────────────
     imageUrls['bluetooth-obd2-scanner'] = await uploadPair('bluetooth-obd2-scanner', [
-        'https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/5835359/pexels-photo-5835359.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/5922216/pexels-photo-5922216.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Digital Car Battery Tester ────────────────────────────────────────────
     imageUrls['digital-battery-tester'] = await uploadPair('digital-battery-tester', [
-        'https://images.pexels.com/photos/3785935/pexels-photo-3785935.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/4315548/pexels-photo-4315548.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/5691659/pexels-photo-5691659.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/2244746/pexels-photo-2244746.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Portable Car Jump Starter 800A ────────────────────────────────────────
     imageUrls['portable-jump-starter-800a'] = await uploadPair('portable-jump-starter-800a', [
-        'https://images.pexels.com/photos/4315548/pexels-photo-4315548.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8985458/pexels-photo-8985458.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/7564855/pexels-photo-7564855.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Jump Starter + Tyre Inflator 4-in-1 ──────────────────────────────────
     imageUrls['jump-starter-tyre-inflator-4in1'] = await uploadPair('jump-starter-tyre-inflator-4in1', [
-        'https://images.pexels.com/photos/6873076/pexels-photo-6873076.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/4315548/pexels-photo-4315548.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8985460/pexels-photo-8985460.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4489760/pexels-photo-4489760.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Heavy-Duty Jumper Cables ──────────────────────────────────────────────
     imageUrls['heavy-duty-jumper-cables'] = await uploadPair('heavy-duty-jumper-cables', [
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
         'https://images.pexels.com/photos/4315548/pexels-photo-4315548.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/5691660/pexels-photo-5691660.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Portable 12V Car Air Compressor ──────────────────────────────────────
     imageUrls['12v-car-air-compressor'] = await uploadPair('12v-car-air-compressor', [
-        'https://images.pexels.com/photos/4489702/pexels-photo-4489702.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4489732/pexels-photo-4489732.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4489737/pexels-photo-4489737.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Digital Tyre Pressure Gauge ───────────────────────────────────────────
     imageUrls['digital-tyre-pressure-gauge'] = await uploadPair('digital-tyre-pressure-gauge', [
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/4489702/pexels-photo-4489702.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4489743/pexels-photo-4489743.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8986143/pexels-photo-8986143.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Tubeless Tyre Repair Kit ──────────────────────────────────────────────
     imageUrls['tubeless-tyre-repair-kit'] = await uploadPair('tubeless-tyre-repair-kit', [
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/6873076/pexels-photo-6873076.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4489764/pexels-photo-4489764.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8986149/pexels-photo-8986149.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Heavy-Duty Hydraulic Car Jack 3T ─────────────────────────────────────
     imageUrls['hydraulic-car-jack-3t'] = await uploadPair('hydraulic-car-jack-3t', [
-        'https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3785935/pexels-photo-3785935.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4489734/pexels-photo-4489734.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8986153/pexels-photo-8986153.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Electric Car Jack ─────────────────────────────────────────────────────
     imageUrls['electric-car-jack'] = await uploadPair('electric-car-jack', [
+        'https://images.pexels.com/photos/4489731/pexels-photo-4489731.jpeg?auto=compress&cs=tinysrgb&w=1200',
         'https://images.pexels.com/photos/6873076/pexels-photo-6873076.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Car Emergency Safety Kit ──────────────────────────────────────────────
     imageUrls['car-emergency-safety-kit'] = await uploadPair('car-emergency-safety-kit', [
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/6873076/pexels-photo-6873076.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8422152/pexels-photo-8422152.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/5691654/pexels-photo-5691654.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Steering Wheel Lock ───────────────────────────────────────────────────
     imageUrls['steering-wheel-lock'] = await uploadPair('steering-wheel-lock', [
-        'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/97079/pexels-photo-97079.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/1381816/pexels-photo-1381816.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Reflective Safety Triangle & Vest ─────────────────────────────────────
     imageUrls['reflective-safety-triangle-vest'] = await uploadPair('reflective-safety-triangle-vest', [
-        'https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8422149/pexels-photo-8422149.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/8422155/pexels-photo-8422155.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Portable Car Vacuum Cleaner ───────────────────────────────────────────
     imageUrls['portable-car-vacuum-cleaner'] = await uploadPair('portable-car-vacuum-cleaner', [
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/6873062/pexels-photo-6873062.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/6873081/pexels-photo-6873081.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Car Detailing Cleaning Brush Kit ─────────────────────────────────────
     imageUrls['car-detailing-cleaning-brush-kit'] = await uploadPair('car-detailing-cleaning-brush-kit', [
-        'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/6873059/pexels-photo-6873059.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/6873088/pexels-photo-6873088.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Full HD Dash Camera ───────────────────────────────────────────────────
     imageUrls['full-hd-dash-camera'] = await uploadPair('full-hd-dash-camera', [
-        'https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3785935/pexels-photo-3785935.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/3354648/pexels-photo-3354648.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/2036544/pexels-photo-2036544.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Fast-Charging Car Charger ─────────────────────────────────────────────
     imageUrls['fast-charging-car-charger'] = await uploadPair('fast-charging-car-charger', [
-        'https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/3785935/pexels-photo-3785935.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4068314/pexels-photo-4068314.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/6872572/pexels-photo-6872572.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── Universal Car Phone Holder ────────────────────────────────────────────
     imageUrls['universal-car-phone-holder'] = await uploadPair('universal-car-phone-holder', [
-        'https://images.pexels.com/photos/3785935/pexels-photo-3785935.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/4068320/pexels-photo-4068320.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/6872579/pexels-photo-6872579.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     // ── 12V/24V Car Power Inverter 300W ──────────────────────────────────────
     imageUrls['12v-24v-car-power-inverter'] = await uploadPair('12v-24v-car-power-inverter', [
-        'https://images.pexels.com/photos/4315548/pexels-photo-4315548.jpeg?auto=compress&cs=tinysrgb&w=1200',
-        'https://images.pexels.com/photos/279949/pexels-photo-279949.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=1200',
+        'https://images.pexels.com/photos/163100/pexels-photo-163100.jpeg?auto=compress&cs=tinysrgb&w=1200',
     ]);
 
     console.log('✅ All images uploaded successfully');
