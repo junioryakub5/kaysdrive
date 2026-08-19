@@ -109,8 +109,10 @@ export interface CarFilters {
 export interface ProductCategory {
     id: string;
     name: string;
+    slug?: string;
     description?: string;
     image?: string;
+    icon?: string;
     sortOrder: number;
     isActive: boolean;
     productCount?: number;
@@ -121,20 +123,44 @@ export interface ProductCategory {
 export interface Product {
     id: string;
     name: string;
+    slug?: string;
     shortDescription?: string;
     description: string;
     categoryId?: string;
     category?: { id: string; name: string };
+    brand?: string;
     price: number;
     discountPrice?: number;
     sku?: string;
     stock: number;
+    lowStockThreshold: number;
     images: string[];
+    tags: string[];
+    specifications: { key: string; value: string }[];
+    compatibility: string[];
+    warranty?: string;
+    whatsIncluded?: string;
+    condition: string;
+    salesCount: number;
     isAvailable: boolean;
     isFeatured: boolean;
+    isNewArrival: boolean;
     isPublished: boolean;
+    avgRating?: number;
+    reviewCount?: number;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface ProductReview {
+    id: string;
+    productId: string;
+    customerName: string;
+    rating: number;
+    title?: string;
+    comment: string;
+    isVerified: boolean;
+    createdAt: string;
 }
 
 export interface CartItem {
@@ -166,8 +192,11 @@ export interface Order {
     customerEmail: string;
     customerPhone?: string;
     deliveryAddress?: string;
+    region?: string;
+    city?: string;
     notes?: string;
     subtotal: number;
+    shippingFee: number;
     discount: number;
     total: number;
     paymentStatus: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
@@ -176,4 +205,3 @@ export interface Order {
     createdAt: string;
     updatedAt: string;
 }
-

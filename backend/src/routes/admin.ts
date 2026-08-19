@@ -686,10 +686,10 @@ adminRouter.get('/categories', authMiddleware, async (_req: Request, res: Respon
 
 adminRouter.post('/categories', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, description, image, sortOrder, isActive } = req.body;
+        const { name, description, image, icon, slug, sortOrder, isActive } = req.body;
         if (!name) throw new AppError('Category name is required', 400);
         const category = await prisma.productCategory.create({
-            data: { name, description, image, sortOrder: sortOrder ?? 0, isActive: isActive ?? true },
+            data: { name, description, image, icon: icon || null, slug: slug || null, sortOrder: sortOrder ?? 0, isActive: isActive ?? true },
         });
         res.status(201).json(category);
     } catch (error) {
@@ -699,10 +699,10 @@ adminRouter.post('/categories', authMiddleware, async (req: Request, res: Respon
 
 adminRouter.put('/categories/:id', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, description, image, sortOrder, isActive } = req.body;
+        const { name, description, image, icon, slug, sortOrder, isActive } = req.body;
         const category = await prisma.productCategory.update({
             where: { id: req.params.id },
-            data: { name, description, image, sortOrder, isActive },
+            data: { name, description, image, icon, slug, sortOrder, isActive },
         });
         res.json(category);
     } catch (error) {
@@ -782,6 +782,8 @@ adminRouter.post('/products', authMiddleware, async (req: Request, res: Response
             name, shortDescription, description, categoryId,
             price, discountPrice, sku, stock, images,
             isAvailable, isFeatured, isPublished,
+            brand, tags, specifications, compatibility,
+            warranty, whatsIncluded, condition, isNewArrival, lowStockThreshold,
         } = req.body;
 
         if (!name || !description || price === undefined) {
@@ -800,6 +802,15 @@ adminRouter.post('/products', authMiddleware, async (req: Request, res: Response
                 isAvailable: isAvailable ?? true,
                 isFeatured: isFeatured ?? false,
                 isPublished: isPublished ?? true,
+                brand: brand || null,
+                tags: typeof tags === 'string' ? tags : JSON.stringify(tags || []),
+                specifications: typeof specifications === 'string' ? specifications : JSON.stringify(specifications || []),
+                compatibility: typeof compatibility === 'string' ? compatibility : JSON.stringify(compatibility || []),
+                warranty: warranty || null,
+                whatsIncluded: whatsIncluded || null,
+                condition: condition || 'NEW',
+                isNewArrival: isNewArrival ?? true,
+                lowStockThreshold: parseInt(lowStockThreshold) || 5,
             },
         });
         res.status(201).json({ ...product, images: parseProductImages(product.images) });
@@ -814,6 +825,8 @@ adminRouter.put('/products/:id', authMiddleware, async (req: Request, res: Respo
             name, shortDescription, description, categoryId,
             price, discountPrice, sku, stock, images,
             isAvailable, isFeatured, isPublished,
+            brand, tags, specifications, compatibility,
+            warranty, whatsIncluded, condition, isNewArrival, lowStockThreshold,
         } = req.body;
 
         const updateData: any = {};
@@ -829,6 +842,15 @@ adminRouter.put('/products/:id', authMiddleware, async (req: Request, res: Respo
         if (isAvailable !== undefined) updateData.isAvailable = isAvailable;
         if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
         if (isPublished !== undefined) updateData.isPublished = isPublished;
+        if (brand !== undefined) updateData.brand = brand || null;
+        if (tags !== undefined) updateData.tags = typeof tags === 'string' ? tags : JSON.stringify(tags || []);
+        if (specifications !== undefined) updateData.specifications = typeof specifications === 'string' ? specifications : JSON.stringify(specifications || []);
+        if (compatibility !== undefined) updateData.compatibility = typeof compatibility === 'string' ? compatibility : JSON.stringify(compatibility || []);
+        if (warranty !== undefined) updateData.warranty = warranty || null;
+        if (whatsIncluded !== undefined) updateData.whatsIncluded = whatsIncluded || null;
+        if (condition !== undefined) updateData.condition = condition;
+        if (isNewArrival !== undefined) updateData.isNewArrival = isNewArrival;
+        if (lowStockThreshold !== undefined) updateData.lowStockThreshold = parseInt(lowStockThreshold) || 5;
 
         const product = await prisma.product.update({
             where: { id: req.params.id },
@@ -953,9 +975,29 @@ adminRouter.patch('/orders/:id/status', authMiddleware, async (req: Request, res
         const validOrderStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'READY', 'DISPATCHED', 'DELIVERED', 'CANCELLED'];
         const validPaymentStatuses = ['PENDING', 'PAID', 'FAILED', 'REFUNDED'];
 
+        // Order status state machine — valid transitions
+        const validTransitions: Record<string, string[]> = {
+            PENDING: ['CONFIRMED', 'CANCELLED'],
+            CONFIRMED: ['PROCESSING', 'CANCELLED'],
+            PROCESSING: ['READY', 'CANCELLED'],
+            READY: ['DISPATCHED', 'CANCELLED'],
+            DISPATCHED: ['DELIVERED'],
+            DELIVERED: [],
+            CANCELLED: [],
+        };
+
         const updateData: any = {};
+
         if (orderStatus) {
             if (!validOrderStatuses.includes(orderStatus)) throw new AppError('Invalid order status', 400);
+
+            // Validate transition
+            const currentOrder = await prisma.order.findUnique({ where: { id: req.params.id }, select: { orderStatus: true } });
+            if (!currentOrder) throw new AppError('Order not found', 404);
+            const allowed = validTransitions[currentOrder.orderStatus] || [];
+            if (!allowed.includes(orderStatus)) {
+                throw new AppError(`Cannot transition from ${currentOrder.orderStatus} to ${orderStatus}`, 400);
+            }
             updateData.orderStatus = orderStatus;
         }
         if (paymentStatus) {
@@ -970,6 +1012,117 @@ adminRouter.patch('/orders/:id/status', authMiddleware, async (req: Request, res
             data: updateData,
         });
         res.json({ success: true, order });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// =============================================================================
+// PRODUCT REVIEWS (Admin moderation)
+// =============================================================================
+
+adminRouter.get('/reviews', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { status, page = '1', limit = '20' } = req.query;
+        const pageNum = Math.max(1, parseInt(page as string) || 1);
+        const limitNum = Math.min(50, parseInt(limit as string) || 20);
+
+        const where: any = {};
+        if (status === 'pending') where.isApproved = false;
+        if (status === 'approved') where.isApproved = true;
+
+        const [reviews, total] = await Promise.all([
+            prisma.productReview.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                skip: (pageNum - 1) * limitNum,
+                take: limitNum,
+                include: { product: { select: { id: true, name: true } } },
+            }),
+            prisma.productReview.count({ where }),
+        ]);
+
+        res.json({
+            reviews,
+            pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.patch('/reviews/:id/approve', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const review = await prisma.productReview.update({
+            where: { id: req.params.id },
+            data: { isApproved: true },
+        });
+        res.json({ success: true, review });
+    } catch (error) {
+        next(error);
+    }
+});
+
+adminRouter.patch('/reviews/:id/reject', authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await prisma.productReview.delete({ where: { id: req.params.id } });
+        res.json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// =============================================================================
+// STORE STATS (Enhanced)
+// =============================================================================
+
+adminRouter.get('/store-stats', authMiddleware, async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const [
+            totalProducts,
+            lowStockProducts,
+            outOfStockProducts,
+            totalOrders,
+            pendingOrders,
+            todayOrders,
+            totalRevenue,
+            todayRevenue,
+            totalCustomers,
+            pendingReviews,
+            bestSellers,
+            recentOrders,
+        ] = await Promise.all([
+            prisma.product.count(),
+            prisma.product.count({ where: { stock: { gt: 0, lte: 5 }, isPublished: true } }),
+            prisma.product.count({ where: { stock: { lte: 0 }, isPublished: true } }),
+            prisma.order.count(),
+            prisma.order.count({ where: { orderStatus: 'PENDING' } }),
+            prisma.order.count({ where: { createdAt: { gte: today } } }),
+            prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: 'PAID' } }),
+            prisma.order.aggregate({ _sum: { total: true }, where: { paymentStatus: 'PAID', createdAt: { gte: today } } }),
+            prisma.order.groupBy({ by: ['customerEmail'], _count: true }).then(r => r.length),
+            prisma.productReview.count({ where: { isApproved: false } }),
+            prisma.product.findMany({ where: { isPublished: true }, orderBy: { salesCount: 'desc' }, take: 5, select: { id: true, name: true, salesCount: true, price: true } }),
+            prisma.order.findMany({ orderBy: { createdAt: 'desc' }, take: 5, select: { id: true, orderNumber: true, customerName: true, total: true, orderStatus: true, paymentStatus: true, createdAt: true } }),
+        ]);
+
+        res.json({
+            totalProducts,
+            lowStockProducts,
+            outOfStockProducts,
+            totalOrders,
+            pendingOrders,
+            todayOrders,
+            totalRevenue: totalRevenue._sum.total || 0,
+            todayRevenue: todayRevenue._sum.total || 0,
+            totalCustomers,
+            pendingReviews,
+            bestSellers,
+            recentOrders,
+        });
     } catch (error) {
         next(error);
     }

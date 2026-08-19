@@ -30,6 +30,15 @@ type FormState = {
     isAvailable: boolean;
     isFeatured: boolean;
     isPublished: boolean;
+    brand: string;
+    warranty: string;
+    whatsIncluded: string;
+    condition: string;
+    tags: string;
+    specifications: string;
+    compatibility: string;
+    lowStockThreshold: string;
+    isNewArrival: boolean;
 };
 
 const defaultForm = (): FormState => ({
@@ -37,6 +46,9 @@ const defaultForm = (): FormState => ({
     categoryId: '', price: '', discountPrice: '', sku: '',
     stock: '0', images: [],
     isAvailable: true, isFeatured: false, isPublished: true,
+    brand: '', warranty: '', whatsIncluded: '', condition: 'NEW',
+    tags: '', specifications: '', compatibility: '',
+    lowStockThreshold: '5', isNewArrival: true,
 });
 
 export default function AdminProducts() {
@@ -83,6 +95,15 @@ export default function AdminProducts() {
                 isAvailable: product.isAvailable,
                 isFeatured: product.isFeatured,
                 isPublished: product.isPublished,
+                brand: product.brand || '',
+                warranty: product.warranty || '',
+                whatsIncluded: product.whatsIncluded || '',
+                condition: product.condition || 'NEW',
+                tags: Array.isArray(product.tags) ? product.tags.join(', ') : '',
+                specifications: '',
+                compatibility: Array.isArray(product.compatibility) ? product.compatibility.join(', ') : '',
+                lowStockThreshold: String(product.lowStockThreshold || 5),
+                isNewArrival: product.isNewArrival ?? true,
             });
         } else {
             setEditingProduct(null);
@@ -111,6 +132,15 @@ export default function AdminProducts() {
                 isAvailable: form.isAvailable,
                 isFeatured: form.isFeatured,
                 isPublished: form.isPublished,
+                brand: form.brand || null,
+                warranty: form.warranty || null,
+                whatsIncluded: form.whatsIncluded || null,
+                condition: form.condition,
+                tags: JSON.stringify(form.tags.split(',').map(t => t.trim()).filter(Boolean)),
+                specifications: form.specifications || '[]',
+                compatibility: JSON.stringify(form.compatibility.split(',').map(t => t.trim()).filter(Boolean)),
+                lowStockThreshold: parseInt(form.lowStockThreshold) || 5,
+                isNewArrival: form.isNewArrival,
             };
             if (editingProduct) {
                 await adminStoreApi.updateProduct(editingProduct.id, payload);
@@ -177,6 +207,7 @@ export default function AdminProducts() {
                         <thead>
                             <tr>
                                 <th>Product</th>
+                                <th>Brand</th>
                                 <th>Category</th>
                                 <th>Price</th>
                                 <th>Stock</th>
@@ -204,6 +235,9 @@ export default function AdminProducts() {
                                                 {p.sku && <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>SKU: {p.sku}</div>}
                                             </div>
                                         </div>
+                                    </td>
+                                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                                        {p.brand || <span style={{ color: 'var(--text-muted)' }}>—</span>}
                                     </td>
                                     <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                                         {p.category?.name || <span style={{ color: 'var(--text-muted)' }}>—</span>}
@@ -310,6 +344,41 @@ export default function AdminProducts() {
                         </div>
                     </div>
 
+                    <div className="form-grid-2">
+                        <div className="form-group">
+                            <label className="form-label">Brand</label>
+                            <input className="form-input" value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))} placeholder="e.g. TOPDON, ANCEL" />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Condition</label>
+                            <select className="form-select" value={form.condition} onChange={e => setForm(f => ({ ...f, condition: e.target.value }))}>
+                                <option value="NEW">NEW</option>
+                                <option value="REFURBISHED">REFURBISHED</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="form-grid-2">
+                        <div className="form-group">
+                            <label className="form-label">Warranty</label>
+                            <input className="form-input" value={form.warranty} onChange={e => setForm(f => ({ ...f, warranty: e.target.value }))} placeholder="e.g. 1 Year Manufacturer Warranty" />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Low Stock Threshold</label>
+                            <input type="number" className="form-input" value={form.lowStockThreshold} onChange={e => setForm(f => ({ ...f, lowStockThreshold: e.target.value }))} min="0" />
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">What's Included</label>
+                        <textarea className="form-textarea" rows={2} value={form.whatsIncluded} onChange={e => setForm(f => ({ ...f, whatsIncluded: e.target.value }))} placeholder="e.g. 1x Scanner, 1x USB Cable..." />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Tags</label>
+                        <input className="form-input" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="Comma separated: obd2, diagnostic, scanner" />
+                    </div>
+
                     <div className="form-group">
                         <label className="form-label">Product Images</label>
                         <ImageUpload images={form.images} onChange={imgs => setForm(f => ({ ...f, images: imgs }))} maxImages={10} />
@@ -320,6 +389,7 @@ export default function AdminProducts() {
                             { key: 'isPublished', label: 'Published (visible to customers)' },
                             { key: 'isAvailable', label: 'Available for purchase' },
                             { key: 'isFeatured', label: 'Featured on store homepage' },
+                            { key: 'isNewArrival', label: 'New Arrival' },
                         ].map(({ key, label }) => (
                             <label key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' }}>
                                 <input

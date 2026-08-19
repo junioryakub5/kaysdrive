@@ -166,8 +166,10 @@ model Admin {
 model ProductCategory {
   id          String    @id @default(uuid())
   name        String
+  slug        String?   @unique
   description String?
   image       String?
+  icon        String?   // Icon identifier for frontend (e.g. "wrench", "battery")
   sortOrder   Int       @default(0)
   isActive    Boolean   @default(true)
   products    Product[]
@@ -181,19 +183,31 @@ model ProductCategory {
 model Product {
   id               String           @id @default(uuid())
   name             String
+  slug             String?          @unique
   shortDescription String?
   description      String
   categoryId       String?
   category         ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brand            String?          // e.g. "TOPDON", "ANCEL", "NEXPEAK"
   price            Float
   discountPrice    Float?
   sku              String?          @unique
   stock            Int              @default(0)
+  lowStockThreshold Int             @default(5)
   images           String           @default("[]") // JSON array of Cloudinary URLs
+  tags             String           @default("[]") // JSON array for search keywords
+  specifications   String           @default("[]") // JSON array [{key, value}]
+  compatibility    String           @default("[]") // JSON array of compatible vehicles
+  warranty         String?          // e.g. "1 Year Manufacturer Warranty"
+  whatsIncluded    String?          // e.g. "1x Scanner, 1x USB Cable, 1x Manual"
+  condition        String           @default("NEW") // NEW, REFURBISHED
+  salesCount       Int              @default(0)
   isAvailable      Boolean          @default(true)
   isFeatured       Boolean          @default(false)
+  isNewArrival     Boolean          @default(true)
   isPublished      Boolean          @default(true)
   orderItems       OrderItem[]
+  reviews          ProductReview[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -201,6 +215,26 @@ model Product {
   @@index([isFeatured])
   @@index([isPublished])
   @@index([categoryId])
+  @@index([brand])
+  @@index([salesCount])
+  @@index([categoryId, isPublished, isAvailable])
+}
+
+model ProductReview {
+  id            String   @id @default(uuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customerName  String
+  customerEmail String
+  rating        Int      // 1-5
+  title         String?
+  comment       String
+  isVerified    Boolean  @default(false) // verified purchase (matched by email + product)
+  isApproved    Boolean  @default(false) // admin moderation
+  createdAt     DateTime @default(now())
+
+  @@index([productId, isApproved])
+  @@index([createdAt])
 }
 
 model Order {
@@ -210,8 +244,11 @@ model Order {
   customerEmail   String
   customerPhone   String?
   deliveryAddress String?
+  region          String?
+  city            String?
   notes           String?
   subtotal        Float
+  shippingFee     Float       @default(0)
   discount        Float       @default(0)
   total           Float
   paymentStatus   String      @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
@@ -242,3 +279,4 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
 }
+
