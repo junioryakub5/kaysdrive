@@ -107,8 +107,9 @@ export const Header = () => {
                     {/* Right Actions */}
                     <div className="flex items-center gap-4">
                         <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                             onClick={() => {
                                 if (location.pathname === '/') {
                                     // Scroll to filter section on homepage
@@ -123,7 +124,8 @@ export const Header = () => {
                             }}
                         >
                             <FiSearch
-                                className={`w-5 h-5 ${showTransparentNav ? 'text-white' : 'text-gray-900'}`}
+                                className={`w-[22px] h-[22px] ${showTransparentNav ? 'text-white' : 'text-gray-900'}`}
+                                strokeWidth={2.5}
                             />
                         </motion.button>
 
