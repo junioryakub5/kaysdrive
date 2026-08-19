@@ -5,6 +5,7 @@ import { HomePage } from './pages/HomePage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import AdminLayout from './components/Admin/AdminLayout';
 import AgentLayout from './components/Agent/AgentLayout';
+import RouteErrorPage from './pages/RouteErrorPage';
 
 // Lazy load heavy pages - use named imports wrapped for named exports
 const CarsListingPage = lazy(() => import('./pages/CarsListingPage').then(m => ({ default: m.CarsListingPage })));
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
     {
         path: '/',
         element: <MainLayout />,
+        errorElement: <RouteErrorPage />,
         children: [
             {
                 index: true,
@@ -122,6 +124,7 @@ export const router = createBrowserRouter([
                 <AdminLayout />
             </ProtectedRoute>
         ),
+        errorElement: <RouteErrorPage />,
         children: [
             {
                 path: 'dashboard',
@@ -174,6 +177,7 @@ export const router = createBrowserRouter([
                 <AgentLayout />
             </ProtectedRoute>
         ),
+        errorElement: <RouteErrorPage />,
         children: [
             {
                 path: 'dashboard',
