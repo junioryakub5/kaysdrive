@@ -182,7 +182,7 @@ export const ImageUpload = ({ images, onChange, maxImages = 10, uploadUrl, token
             <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/avif"
                 multiple
                 onChange={handleFileSelect}
                 style={{ display: 'none' }}
