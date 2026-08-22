@@ -386,7 +386,13 @@ export default function AdminProducts() {
 
                     <div className="form-group">
                         <label className="form-label">Product Images</label>
-                        <ImageUpload images={form.images} onChange={imgs => setForm(f => ({ ...f, images: imgs }))} maxImages={10} />
+                        <ImageUpload
+                            images={form.images}
+                            onChange={imgs => setForm(f => ({ ...f, images: imgs }))}
+                            maxImages={10}
+                            uploadUrl={UPLOAD_URL}
+                            token={localStorage.getItem('admin_token')}
+                        />
                     </div>
 
                     <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>

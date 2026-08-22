@@ -4,12 +4,19 @@ interface ImageUploadProps {
     images: string[];
     onChange: (urls: string[]) => void;
     maxImages?: number;
+    /** Override the upload endpoint. Defaults to /upload/multiple (cars). */
+    uploadUrl?: string;
+    /** JWT token to include as Authorization: Bearer <token>. */
+    token?: string | null;
 }
 
-export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadProps) => {
+export const ImageUpload = ({ images, onChange, maxImages = 10, uploadUrl, token }: ImageUploadProps) => {
     const [uploading, setUploading] = useState(false);
     const [dragging, setDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const defaultUploadUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/upload/multiple`;
+    const resolvedUploadUrl = uploadUrl ?? defaultUploadUrl;
 
     const uploadFiles = async (files: File[]) => {
         const remainingSlots = maxImages - images.length;
@@ -26,8 +33,12 @@ export const ImageUpload = ({ images, onChange, maxImages = 10 }: ImageUploadPro
             const formData = new FormData();
             filesToUpload.forEach(file => formData.append('images', file));
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/upload/multiple`, {
+            const headers: HeadersInit = {};
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const response = await fetch(resolvedUploadUrl, {
                 method: 'POST',
+                headers,
                 body: formData,
             });
 
