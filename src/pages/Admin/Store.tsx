@@ -11,7 +11,12 @@ const UPLOAD_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api
 const uploadProductImages = async (files: FileList | File[]): Promise<string[]> => {
     const formData = new FormData();
     Array.from(files).forEach(f => formData.append('images', f));
-    const response = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+    const token = localStorage.getItem('admin_token');
+    const response = await fetch(UPLOAD_URL, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        body: formData,
+    });
     if (!response.ok) throw new Error('Upload failed');
     const data = await response.json();
     return data.urls;
